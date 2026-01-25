@@ -1,14 +1,34 @@
-[gd_scene load_steps=3 format=3 uid="uid://dy7v23qbb67yj"]
+[gd_scene load_steps=5 format=3 uid="uid://dy7v23qbb67yj"]
 
 [ext_resource type="Script" uid="uid://b25ehul0or7qe" path="res://Scripts/Cell/cell.gd" id="1_da881"]
 [ext_resource type="Texture2D" uid="uid://q8p7ue7reuji" path="res://Textures/cell.png" id="1_efq80"]
 
-[node name="Cell" type="CharacterBody2D"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_da881"]
+radius = 25.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gilj4"]
+
+[node name="Cell" type="CharacterBody2D" groups=["cell"]]
 motion_mode = 1
 script = ExtResource("1_da881")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("1_efq80")
-
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(-2.5, -8, -4.5, -7.5, -4.5, -6.5, -5.3, -6.5, -6.3, -4.5, -7.5, -4.5, -7.5, -2.5, -8, 2.5, -7.5, 4.5, -6.5, 4.5, -6.5, 5.5, -5.3, 5.5, -4.3, 7.5, -2.5, 7.5, 2.5, 8, 4.5, 7.5, 4.5, 6.5, 5.3, 6.5, 6.3, 4.5, 7.5, 4.5, 7.5, 2.5, 8, -2.5, 7.5, -4.3, 5.5, -5.3, 5.5, -6.5, 4.5, -6.5, 4.5, -7.5, 2.5, -7.5)
+
+[node name="Sprite2D" type="Sprite2D" parent="CollisionPolygon2D"]
+texture = ExtResource("1_efq80")
+
+[node name="VisionRange" type="Area2D" parent="." groups=["visionbox"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="VisionRange"]
+shape = SubResource("CircleShape2D_da881")
+
+[node name="HitBox" type="Area2D" parent="." groups=["hitbox"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+shape = SubResource("CircleShape2D_gilj4")
+
+[connection signal="area_entered" from="VisionRange" to="." method="_on_vision_range_area_entered"]
+[connection signal="area_exited" from="VisionRange" to="." method="_on_vision_range_area_exited"]
+[connection signal="area_entered" from="HitBox" to="." method="_on_hit_box_area_entered"]
+[connection signal="area_exited" from="HitBox" to="." method="_on_hit_box_area_exited"]

@@ -22,6 +22,12 @@ window/size/viewport_height=720
 window/stretch/mode="viewport"
 window/vsync/vsync_mode=0
 
+[global_group]
+
+hitbox=""
+cell=""
+visionbox=""
+
 [input]
 
 camera_move_up={

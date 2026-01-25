@@ -4,40 +4,220 @@ class_name Cell
 var rng = RandomNumberGenerator.new()
 var gcs = GenerateCellStats.new()
 
+#Node Variables
+@onready var collision_node = $CollisionPolygon2D
+@onready var vision_node = $VisionRange
+@onready var hit_box_node = $HitBox
+
 #Identity Variables
 var cell_uuid: String
 var species_uuid: String
 var birth_type: String
 var parent: Node
 
+#Targeting Variables
+var targets: Array
+var attackable_targets: Array
+
+#Movement Variables
+var current_x_movement: float
+var desired_x_movement: float
+var current_y_movement: float
+var desired_y_movement: float
+var movement_change: float
+var damaged: float
+var attacker: Node
+
 #Growth Stats
 var current_growth: float = 0.0
 var growth_speed: float
 
 #Birth Stats (Needed for Growth)
+var birth_scale: float
+var birth_damage: float
+var birth_max_health: float
+var birth_movement_speed: float
 
 #Current Stats (with Growth Calculated)
+var current_scale: float
+var current_damage: float
+var current_damage_cooldown: float
+var current_max_health: float
+var current_health: float
+var current_movement_speed: float
 
 #Static Stats
 var color: Color
+var damage_cooldown: float
 
 func _ready() -> void:
 	cell_uuid = gcs.create_uuid() #Generate new cell uuid
 	
 #Cell is CREATED
-	if !birth_type:
+	if birth_type == "miracle":
 		species_uuid = gcs.create_uuid() #Generate new species uuid
 		color = Color(rng.randf_range(0.1,0.9),rng.randf_range(0.1,0.9),rng.randf_range(0.1,0.9),1.0)
+		growth_speed = rng.randf_range(0.000025,0.001)
+		movement_change = rng.randf_range(0.00001,0.01)
+		birth_damage = rng.randf_range(0.5,3)
+		damage_cooldown = rng.randf_range(0.5,3)
+		birth_max_health = rng.randf_range(1,4)
+		birth_movement_speed = rng.randf_range(0.5,5)
+		birth_scale = rng.randf_range(0.5,1.25)
 	
 #Cell is BORN
 	elif birth_type == "born":
 		if !parent:
 			queue_free()
 		species_uuid = parent.species_uuid
-		color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.05)
-		color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.05)
-		color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.05)
+		growth_speed = gcs.create_rand_stat_from_stat(parent.growth_speed, 0.000005)
+		movement_change = gcs.create_rand_stat_from_stat(parent.movement_change, 0.00005)
+		birth_damage = gcs.create_rand_stat_from_stat(parent.birth_damage, 0.05)
+		damage_cooldown = gcs.create_rand_stat_from_stat(parent.damage_cooldown, 0.05)
+		birth_max_health = gcs.create_rand_stat_from_stat(parent.birth_max_health, 0.05)
+		birth_movement_speed = gcs.create_rand_stat_from_stat(parent.birth_movement_speed, 0.05)
+		birth_scale = gcs.create_rand_stat_from_stat(parent.birth_scale, 0.05)
+		color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.005)
+		color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.005)
+		color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.005)
 		
 #Apply stats
-	$Sprite2D.modulate = Color(color)
+	$CollisionPolygon2D/Sprite2D.modulate = Color(color)
+	current_damage = birth_damage
+	current_damage_cooldown = damage_cooldown
+	current_max_health = birth_max_health
+	current_health = birth_max_health
+	current_scale = birth_scale
+	current_movement_speed = birth_movement_speed
+	_update_stats()
 	
+func _process(delta: float) -> void:
+	_move(delta)
+	_attack(delta)
+	_grow(delta)
+	_update_stats()
+	
+func _grow(delta: float):
+	if current_growth >= 1:
+		return
+	current_growth += growth_speed * delta
+	current_movement_speed = birth_movement_speed * (current_growth + 1)
+	current_scale = birth_scale * (current_growth + 1)
+	
+func _update_stats():
+	scale = Vector2(current_scale,current_scale)
+	
+func _attack(delta: float):
+	if current_damage_cooldown > 0:
+		current_damage_cooldown -= delta
+		return
+	if attackable_targets.size() > 0:
+		current_damage_cooldown = damage_cooldown
+		for target in attackable_targets:
+			target.take_damage(current_damage, self)
+	
+func take_damage(amount: float, attacker_node: Node):
+	print("damaged: ", amount)
+	current_health -= amount
+	damaged += amount
+	attacker = attacker_node
+	if current_health <= 0:
+		if attacker_node:
+			get_parent().summon_cell(global_position,"born",attacker_node)
+		queue_free()
+	
+func _move(delta: float):
+	
+	if damaged > 0 and attacker:
+		var dir = attacker.global_position.direction_to(global_position)
+		velocity = dir * (damaged * 3)
+		damaged -= delta
+		
+	elif targets.size() < 1:
+		if !current_x_movement:
+			current_x_movement = randf_range(-5,5)
+			desired_x_movement = current_x_movement
+		if !current_y_movement:
+			current_y_movement = randf_range(-5,5)
+			desired_y_movement = current_y_movement
+		
+		if round(desired_x_movement) == round(current_x_movement):
+			desired_x_movement = randf_range(-5,5)
+		if round(desired_y_movement) == round(current_y_movement):
+			desired_y_movement = randf_range(-5,5)
+			
+		if desired_x_movement > current_x_movement:
+			current_x_movement += movement_change
+		if desired_x_movement < current_x_movement:
+			current_x_movement -= movement_change
+		if desired_y_movement > current_y_movement:
+			current_y_movement += movement_change
+		if desired_y_movement < current_y_movement:
+			current_y_movement -= movement_change
+		velocity = Vector2(current_x_movement * current_movement_speed,current_y_movement * current_movement_speed)
+	else:
+		var closest_target = get_closest_node(self, targets)
+		var dir = global_position.direction_to(closest_target.global_position)
+		velocity = dir * (current_movement_speed * 2)
+		
+		
+	move_and_slide()
+			
+	
+func get_closest_node(origin: Node2D, nodes: Array) -> Node2D:
+	var closest: Node2D = null
+	var min_dist := INF
+
+	for n in nodes:
+		if n == null or n == origin:
+			continue
+
+		var d := origin.global_position.distance_squared_to(n.global_position)
+		if d < min_dist:
+			min_dist = d
+			closest = n
+
+	return closest
+
+func _on_vision_range_area_entered(area: Area2D) -> void:
+	if area.get_parent() == self:
+		return
+	if area.get_parent().species_uuid == species_uuid:
+		return
+	if !area.is_in_group("hitbox"):
+		return
+	targets.append(area.get_parent())
+	#print(area.get_parent())
+
+
+func _on_vision_range_area_exited(area: Area2D) -> void:
+	if area.get_parent() == self:
+		return
+	if area.get_parent().species_uuid == species_uuid:
+		return
+	if !area.is_in_group("hitbox"):
+		return
+	targets.erase(area.get_parent())
+	#print(area.get_parent())
+
+
+func _on_hit_box_area_entered(area: Area2D) -> void:
+	if area.get_parent() == self:
+		return
+	if area.get_parent().species_uuid == species_uuid:
+		return
+	if !area.is_in_group("hitbox"):
+		return
+	attackable_targets.append(area.get_parent())
+	#print(area.get_parent())
+
+
+func _on_hit_box_area_exited(area: Area2D) -> void:
+	if area.get_parent() == self:
+		return
+	if area.get_parent().species_uuid == species_uuid:
+		return
+	if !area.is_in_group("hitbox"):
+		return
+	attackable_targets.erase(area.get_parent())
+	#print(area.get_parent())

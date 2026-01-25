@@ -1,7 +1,7 @@
 extends Node2D
 class_name CameraController
 
-var camera_speed: float = 0.25
+var camera_speed: float = 0.5
 
 func _process(_delta: float) -> void:
 	_camera_movement()
