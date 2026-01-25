@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://dy7v23qbb67yj"]
+
+[ext_resource type="Script" uid="uid://b25ehul0or7qe" path="res://Scripts/Cell/cell.gd" id="1_da881"]
+[ext_resource type="Texture2D" uid="uid://q8p7ue7reuji" path="res://Textures/cell.png" id="1_efq80"]
+
+[node name="Cell" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_da881")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_efq80")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-2.5, -8, -4.5, -7.5, -4.5, -6.5, -5.3, -6.5, -6.3, -4.5, -7.5, -4.5, -7.5, -2.5, -8, 2.5, -7.5, 4.5, -6.5, 4.5, -6.5, 5.5, -5.3, 5.5, -4.3, 7.5, -2.5, 7.5, 2.5, 8, 4.5, 7.5, 4.5, 6.5, 5.3, 6.5, 6.3, 4.5, 7.5, 4.5, 7.5, 2.5, 8, -2.5, 7.5, -4.3, 5.5, -5.3, 5.5, -6.5, 4.5, -6.5, 4.5, -7.5, 2.5, -7.5)
