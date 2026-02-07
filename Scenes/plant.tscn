@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://cml2iik2kb5i0"]
+
+[ext_resource type="Script" uid="uid://81q38seomhno" path="res://Scripts/plant.gd" id="1_6gypx"]
+[ext_resource type="Texture2D" uid="uid://cjqxtpemp0ee4" path="res://Textures/plant.png" id="1_fgu4o"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6gypx"]
+radius = 11.045361
+
+[node name="Plant" type="RigidBody2D" unique_id=730367311 groups=["plant"]]
+script = ExtResource("1_6gypx")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1810670812]
+texture = ExtResource("1_fgu4o")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=427793246]
+polygon = PackedVector2Array(5, -6.6, 5, -8, -4.5, -8, -6.5, -5, -8, -5, -8, 4.5, -3.6999998, 8, 3.3999996, 8, 6.3999996, 5, 8, 5, 8, -4.5)
+
+[node name="HitBox" type="Area2D" parent="." unique_id=745395831 groups=["hitbox"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=2142531988]
+shape = SubResource("CircleShape2D_6gypx")

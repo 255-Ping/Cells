@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://dy7v23qbb67yj"]
+[gd_scene format=3 uid="uid://dy7v23qbb67yj"]
 
 [ext_resource type="Script" uid="uid://b25ehul0or7qe" path="res://Scripts/Cell/cell.gd" id="1_da881"]
 [ext_resource type="Texture2D" uid="uid://q8p7ue7reuji" path="res://Textures/cell.png" id="1_efq80"]
@@ -8,25 +8,31 @@ radius = 25.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gilj4"]
 
-[node name="Cell" type="CharacterBody2D" groups=["cell"]]
+[node name="Cell" type="CharacterBody2D" unique_id=27172536 groups=["cell", "meat"]]
 motion_mode = 1
 script = ExtResource("1_da881")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=144151949]
 polygon = PackedVector2Array(-2.5, -8, -4.5, -7.5, -4.5, -6.5, -5.3, -6.5, -6.3, -4.5, -7.5, -4.5, -7.5, -2.5, -8, 2.5, -7.5, 4.5, -6.5, 4.5, -6.5, 5.5, -5.3, 5.5, -4.3, 7.5, -2.5, 7.5, 2.5, 8, 4.5, 7.5, 4.5, 6.5, 5.3, 6.5, 6.3, 4.5, 7.5, 4.5, 7.5, 2.5, 8, -2.5, 7.5, -4.3, 5.5, -5.3, 5.5, -6.5, 4.5, -6.5, 4.5, -7.5, 2.5, -7.5)
 
-[node name="Sprite2D" type="Sprite2D" parent="CollisionPolygon2D"]
+[node name="Sprite2D" type="Sprite2D" parent="CollisionPolygon2D" unique_id=1760972111]
 texture = ExtResource("1_efq80")
 
-[node name="VisionRange" type="Area2D" parent="." groups=["visionbox"]]
+[node name="VisionRange" type="Area2D" parent="." unique_id=1710716378 groups=["visionbox"]]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="VisionRange"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="VisionRange" unique_id=2062962166]
 shape = SubResource("CircleShape2D_da881")
 
-[node name="HitBox" type="Area2D" parent="." groups=["hitbox"]]
+[node name="HitBox" type="Area2D" parent="." unique_id=1627726493 groups=["hitbox"]]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=228939399]
 shape = SubResource("CircleShape2D_gilj4")
+
+[node name="Label" type="Label" parent="." unique_id=546933624]
+offset_left = -33.0
+offset_top = -29.0
+offset_right = 56.0
+offset_bottom = -6.0
 
 [connection signal="area_entered" from="VisionRange" to="." method="_on_vision_range_area_entered"]
 [connection signal="area_exited" from="VisionRange" to="." method="_on_vision_range_area_exited"]

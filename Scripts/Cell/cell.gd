@@ -12,6 +12,7 @@ var gcs = GenerateCellStats.new()
 #Identity Variables
 var cell_uuid: String
 var species_uuid: String
+var diet_type: String
 var birth_type: String
 var parent: Node
 
@@ -37,6 +38,7 @@ var birth_scale: float
 var birth_damage: float
 var birth_max_health: float
 var birth_movement_speed: float
+var birth_max_hunger: float
 
 #Current Stats (with Growth Calculated)
 var current_scale: float
@@ -55,6 +57,13 @@ func _ready() -> void:
 	
 #Cell is CREATED
 	if birth_type == "miracle":
+		var diet_selector = rng.randi_range(2,2)
+		if diet_selector == 1:
+			diet_type = "carnivore"
+		if diet_selector == 2:
+			diet_type = "omnivore"
+		if diet_selector == 3:
+			diet_type = "herbivore"
 		species_uuid = gcs.create_uuid() #Generate new species uuid
 		color = Color(rng.randf_range(0.1,0.9),rng.randf_range(0.1,0.9),rng.randf_range(0.1,0.9),1.0)
 		growth_speed = rng.randf_range(0.000025,0.001)
@@ -69,6 +78,7 @@ func _ready() -> void:
 	elif birth_type == "born":
 		if !parent:
 			queue_free()
+		diet_type = parent.diet_type
 		species_uuid = parent.species_uuid
 		growth_speed = gcs.create_rand_stat_from_stat(parent.growth_speed, 0.000005)
 		movement_change = gcs.create_rand_stat_from_stat(parent.movement_change, 0.00005)
@@ -89,6 +99,7 @@ func _ready() -> void:
 	current_health = birth_max_health
 	current_scale = birth_scale
 	current_movement_speed = birth_movement_speed
+	$Label.text = diet_type
 	_update_stats()
 	
 func _process(delta: float) -> void:
@@ -124,6 +135,7 @@ func take_damage(amount: float, attacker_node: Node):
 	if current_health <= 0:
 		if attacker_node:
 			get_parent().summon_cell(global_position,"born",attacker_node)
+		#attacker_node.targets.erase
 		queue_free()
 	
 func _move(delta: float):
@@ -180,44 +192,128 @@ func get_closest_node(origin: Node2D, nodes: Array) -> Node2D:
 	return closest
 
 func _on_vision_range_area_entered(area: Area2D) -> void:
-	if area.get_parent() == self:
-		return
-	if area.get_parent().species_uuid == species_uuid:
-		return
-	if !area.is_in_group("hitbox"):
-		return
-	targets.append(area.get_parent())
+	if diet_type == "carnivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
+			return
+		targets.append(area.get_parent())
+	if diet_type == "omnivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		targets.append(area.get_parent())
+	if diet_type == "herbivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		if !area.get_parent().is_in_group("plant"):
+			return
+		targets.append(area.get_parent())
 	#print(area.get_parent())
 
 
 func _on_vision_range_area_exited(area: Area2D) -> void:
-	if area.get_parent() == self:
-		return
-	if area.get_parent().species_uuid == species_uuid:
-		return
-	if !area.is_in_group("hitbox"):
-		return
-	targets.erase(area.get_parent())
+	if diet_type == "carnivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
+			return
+		targets.erase(area.get_parent())
+	if diet_type == "omnivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		targets.erase(area.get_parent())
+	if diet_type == "herbivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		if !area.get_parent().is_in_group("plant"):
+			return
+		targets.erase(area.get_parent())
 	#print(area.get_parent())
 
 
 func _on_hit_box_area_entered(area: Area2D) -> void:
-	if area.get_parent() == self:
-		return
-	if area.get_parent().species_uuid == species_uuid:
-		return
-	if !area.is_in_group("hitbox"):
-		return
-	attackable_targets.append(area.get_parent())
+	if diet_type == "carnivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
+			return
+		attackable_targets.append(area.get_parent())
+	if diet_type == "omnivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		attackable_targets.append(area.get_parent())
+	if diet_type == "herbivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		if !area.get_parent().is_in_group("plant"):
+			return
+		attackable_targets.append(area.get_parent())
 	#print(area.get_parent())
 
 
 func _on_hit_box_area_exited(area: Area2D) -> void:
-	if area.get_parent() == self:
-		return
-	if area.get_parent().species_uuid == species_uuid:
-		return
-	if !area.is_in_group("hitbox"):
-		return
-	attackable_targets.erase(area.get_parent())
+	if diet_type == "carnivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
+			return
+		attackable_targets.erase(area.get_parent())
+	if diet_type == "omnivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		attackable_targets.erase(area.get_parent())
+	if diet_type == "herbivore":
+		if area.get_parent() == self:
+			return
+		if area.get_parent().species_uuid == species_uuid:
+			return
+		if !area.is_in_group("hitbox"):
+			return
+		if !area.get_parent().is_in_group("plant"):
+			return
+		attackable_targets.erase(area.get_parent())
 	#print(area.get_parent())
