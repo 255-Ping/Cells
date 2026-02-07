@@ -32,6 +32,7 @@ var attacker: Node
 #Growth Stats
 var current_growth: float = 0.0
 var growth_speed: float
+var growth_hunger: float
 
 #Birth Stats (Needed for Growth)
 var birth_scale: float
@@ -39,6 +40,7 @@ var birth_damage: float
 var birth_max_health: float
 var birth_movement_speed: float
 var birth_max_hunger: float
+var birth_hunger: float
 
 #Current Stats (with Growth Calculated)
 var current_scale: float
@@ -47,17 +49,23 @@ var current_damage_cooldown: float
 var current_max_health: float
 var current_health: float
 var current_movement_speed: float
+var current_max_hunger: float
+var current_hunger: float
+var hunger_drain: float
 
 #Static Stats
 var color: Color
 var damage_cooldown: float
 
+var main
+
 func _ready() -> void:
+	main = get_parent()
 	cell_uuid = gcs.create_uuid() #Generate new cell uuid
 	
 #Cell is CREATED
 	if birth_type == "miracle":
-		var diet_selector = rng.randi_range(2,2)
+		var diet_selector = rng.randi_range(1,3)
 		if diet_selector == 1:
 			diet_type = "carnivore"
 		if diet_selector == 2:
@@ -73,6 +81,10 @@ func _ready() -> void:
 		birth_max_health = rng.randf_range(1,4)
 		birth_movement_speed = rng.randf_range(0.5,5)
 		birth_scale = rng.randf_range(0.5,1.25)
+		birth_max_hunger = rng.randf_range(1.5,3.5)
+		hunger_drain = rng.randf_range(0.5,0.05)
+		growth_hunger = rng.randf_range(0.1,1.5)
+		birth_hunger = rng.randf_range(1.5, birth_max_hunger)
 	
 #Cell is BORN
 	elif birth_type == "born":
@@ -80,16 +92,20 @@ func _ready() -> void:
 			queue_free()
 		diet_type = parent.diet_type
 		species_uuid = parent.species_uuid
-		growth_speed = gcs.create_rand_stat_from_stat(parent.growth_speed, 0.000005)
-		movement_change = gcs.create_rand_stat_from_stat(parent.movement_change, 0.00005)
-		birth_damage = gcs.create_rand_stat_from_stat(parent.birth_damage, 0.05)
-		damage_cooldown = gcs.create_rand_stat_from_stat(parent.damage_cooldown, 0.05)
-		birth_max_health = gcs.create_rand_stat_from_stat(parent.birth_max_health, 0.05)
-		birth_movement_speed = gcs.create_rand_stat_from_stat(parent.birth_movement_speed, 0.05)
-		birth_scale = gcs.create_rand_stat_from_stat(parent.birth_scale, 0.05)
-		color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.005)
-		color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.005)
-		color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.005)
+		growth_speed = gcs.create_rand_stat_from_stat(parent.growth_speed, 0.000005 * main.cell_mutation_rate)
+		movement_change = gcs.create_rand_stat_from_stat(parent.movement_change, 0.00005 * main.cell_mutation_rate)
+		birth_damage = gcs.create_rand_stat_from_stat(parent.birth_damage, 0.05 * main.cell_mutation_rate)
+		damage_cooldown = gcs.create_rand_stat_from_stat(parent.damage_cooldown, 0.05 * main.cell_mutation_rate)
+		birth_max_health = gcs.create_rand_stat_from_stat(parent.birth_max_health, 0.05 * main.cell_mutation_rate)
+		birth_movement_speed = gcs.create_rand_stat_from_stat(parent.birth_movement_speed, 0.05 * main.cell_mutation_rate)
+		birth_scale = gcs.create_rand_stat_from_stat(parent.birth_scale, 0.01 * main.cell_mutation_rate)
+		birth_max_hunger = gcs.create_rand_stat_from_stat(parent.birth_max_hunger, 0.005 * main.cell_mutation_rate)
+		hunger_drain = gcs.create_rand_stat_from_stat(parent.hunger_drain, 0.00005 * main.cell_mutation_rate)
+		growth_hunger = gcs.create_rand_stat_from_stat(parent.growth_hunger, 0.0005 * main.cell_mutation_rate)
+		birth_hunger = gcs.create_rand_stat_from_stat(parent.birth_hunger, 0.0005 * main.cell_mutation_rate)
+		color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.005 * main.cell_mutation_rate)
+		color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.005 * main.cell_mutation_rate)
+		color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.005 * main.cell_mutation_rate)
 		
 #Apply stats
 	$CollisionPolygon2D/Sprite2D.modulate = Color(color)
@@ -99,21 +115,52 @@ func _ready() -> void:
 	current_health = birth_max_health
 	current_scale = birth_scale
 	current_movement_speed = birth_movement_speed
-	$Label.text = diet_type
+	current_max_hunger = birth_max_hunger
+	current_hunger = birth_hunger * 0.5
 	_update_stats()
 	
 func _process(delta: float) -> void:
 	_move(delta)
 	_attack(delta)
 	_grow(delta)
+	_hunger_check(delta)
+	_check_for_birth()
 	_update_stats()
+	
+	if current_health <= 0:
+		if current_hunger <= 0:
+			main.summon_meat(global_position, current_scale * 0.3)
+		else:
+			main.summon_meat(global_position, current_scale * 0.6)
+		queue_free()
+		
+func _check_for_birth():
+	if current_hunger >= birth_hunger:
+		main.summon_cell(global_position, "born", self)
+		current_hunger -= birth_hunger
+		
 	
 func _grow(delta: float):
 	if current_growth >= 1:
 		return
-	current_growth += growth_speed * delta
-	current_movement_speed = birth_movement_speed * (current_growth + 1)
-	current_scale = birth_scale * (current_growth + 1)
+	if current_hunger > growth_hunger:
+		current_growth += growth_speed * delta
+		current_movement_speed = birth_movement_speed * (current_growth + 1)
+		current_scale = birth_scale * (current_growth + 1)
+		current_max_hunger = birth_max_hunger * (current_growth + 1)
+		if current_hunger > 0:
+			current_hunger -= hunger_drain * delta
+		
+func _hunger_check(delta: float):
+	#print(current_hunger)
+	$Label.text = str(current_hunger)
+	if current_hunger <= 0:
+		current_health -= hunger_drain * delta
+		return
+	var velocity_average = (abs(velocity.x) + abs(velocity.y)) / 2
+	#print(velocity_average)
+	if velocity_average > 0:
+		current_hunger -= (hunger_drain * delta) * (velocity_average * 0.1)
 	
 func _update_stats():
 	scale = Vector2(current_scale,current_scale)
@@ -126,17 +173,24 @@ func _attack(delta: float):
 		current_damage_cooldown = damage_cooldown
 		for target in attackable_targets:
 			target.take_damage(current_damage, self)
+			if target.is_in_group("cell"):
+				current_hunger -= hunger_drain * delta
+			elif current_hunger < current_max_hunger and target.is_in_group("plant"):
+				current_hunger += current_damage * 0.25
+			elif current_hunger < current_max_hunger and target.is_in_group("meat"):
+				current_hunger += current_damage * 0.75
+
 	
 func take_damage(amount: float, attacker_node: Node):
 	print("damaged: ", amount)
 	current_health -= amount
 	damaged += amount
 	attacker = attacker_node
-	if current_health <= 0:
-		if attacker_node:
-			get_parent().summon_cell(global_position,"born",attacker_node)
-		#attacker_node.targets.erase
-		queue_free()
+	#if current_health <= 0:
+	#	if attacker_node:
+	#		get_parent().summon_cell(global_position,"born",attacker_node)
+	#	#attacker_node.targets.erase
+	#	queue_free()
 	
 func _move(delta: float):
 	
