@@ -59,6 +59,8 @@ var damage_cooldown: float
 
 var main
 
+@onready var stats_panel = $Panel
+
 func _ready() -> void:
 	main = get_parent()
 	cell_uuid = gcs.create_uuid() #Generate new cell uuid
@@ -81,10 +83,10 @@ func _ready() -> void:
 		birth_max_health = rng.randf_range(1,4)
 		birth_movement_speed = rng.randf_range(0.5,5)
 		birth_scale = rng.randf_range(0.5,1.25)
-		birth_max_hunger = rng.randf_range(1.5,3.5)
+		birth_max_hunger = rng.randf_range(5,15)
 		hunger_drain = rng.randf_range(0.5,0.05)
-		growth_hunger = rng.randf_range(0.1,1.5)
-		birth_hunger = rng.randf_range(1.5, birth_max_hunger)
+		growth_hunger = rng.randf_range(1,3)
+		birth_hunger = rng.randf_range(1.5, birth_max_hunger * 0.75)
 	
 #Cell is BORN
 	elif birth_type == "born":
@@ -126,6 +128,7 @@ func _process(delta: float) -> void:
 	_hunger_check(delta)
 	_check_for_birth()
 	_update_stats()
+	_update_stats_panel()
 	
 	if current_health <= 0:
 		if current_hunger <= 0:
@@ -133,6 +136,55 @@ func _process(delta: float) -> void:
 		else:
 			main.summon_meat(global_position, current_scale * 0.6)
 		queue_free()
+		
+func _update_stats_panel():
+	$Panel/Label.text = str("cell_uuid: ", cell_uuid, "\n",
+	"species_uuid: ", species_uuid, "\n",
+	"diet_type: ", diet_type, "\n",
+	"birth_type: ", birth_type, "\n",
+	"parent: ", parent, "\n",
+	"\n",
+	
+	"current_health: ", current_health, "\n",
+	"current_max_health: ", current_max_health, "\n",
+	"birth_max_health: ", birth_max_health, "\n",
+	"\n",
+	
+	"current_growth: ", current_growth, "\n",
+	"growth_speed: ", growth_speed, "\n",
+	"growth_hunger: ", growth_hunger, "\n",
+	"\n",
+	
+	"current_hunger: ", current_hunger, "\n",
+	"current_max_hunger: ", current_max_hunger, "\n",
+	"birth_max_hunger: ", birth_max_hunger, "\n",
+	"hunger_drain: ", hunger_drain, "\n",
+	"\n",
+	
+	"birth_movement_speed", birth_movement_speed, "\n",
+	"current_movement_speed", current_movement_speed, "\n",
+	"current_x_movement: ", current_x_movement, "\n",
+	"desired_x_movement: ", desired_x_movement, "\n",
+	"current_y_movement: ", current_y_movement, "\n",
+	"desired_y_movement: ", desired_y_movement, "\n",
+	"velocity: ", velocity, "\n",
+	"movement_change: ", movement_change, "\n",
+	"\n",
+	
+	"damaged: ", damaged, "\n",
+	"\n",
+	
+	"birth_scale: ", birth_scale, "\n",
+	"current_scale: ", current_scale, "\n",
+	"\n",
+	
+	"birth_damage: ", birth_damage, "\n",
+	"current_damage: ", current_damage, "\n",
+	"damage_cooldown: ", damage_cooldown, "\n",
+	"current_damage_cooldown: ", current_damage_cooldown, "\n",
+	"\n",
+	
+	"color: ", color, "\n")
 		
 func _check_for_birth():
 	if current_hunger >= birth_hunger:
@@ -153,7 +205,7 @@ func _grow(delta: float):
 		
 func _hunger_check(delta: float):
 	#print(current_hunger)
-	$Label.text = str(current_hunger)
+	#$Label.text = str(current_hunger)
 	if current_hunger <= 0:
 		current_health -= hunger_drain * delta
 		return
@@ -244,6 +296,8 @@ func get_closest_node(origin: Node2D, nodes: Array) -> Node2D:
 			closest = n
 
 	return closest
+
+
 
 func _on_vision_range_area_entered(area: Area2D) -> void:
 	if diet_type == "carnivore":
