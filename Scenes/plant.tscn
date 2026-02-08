@@ -10,11 +10,11 @@ radius = 11.045361
 gravity_scale = 0.0
 script = ExtResource("1_6gypx")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1810670812]
-texture = ExtResource("1_fgu4o")
-
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=427793246]
 polygon = PackedVector2Array(5, -6.6, 5, -8, -4.5, -8, -6.5, -5, -8, -5, -8, 4.5, -3.6999998, 8, 3.3999996, 8, 6.3999996, 5, 8, 5, 8, -4.5)
+
+[node name="Sprite2D" type="Sprite2D" parent="CollisionPolygon2D" unique_id=1810670812]
+texture = ExtResource("1_fgu4o")
 
 [node name="HitBox" type="Area2D" parent="." unique_id=745395831 groups=["hitbox"]]
 

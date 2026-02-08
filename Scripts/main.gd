@@ -1,6 +1,9 @@
 extends Node2D
 class_name Main
 
+var math = Math.new()
+var rng = RandomNumberGenerator.new()
+
 #Node Variables
 @onready var cell_node = preload("res://Scenes/cell.tscn")
 @onready var plant_node = preload("res://Scenes/plant.tscn")
@@ -9,11 +12,22 @@ class_name Main
 #Cell Modifying Variables
 var cell_mutation_rate: float = 1.0
 
+#Plant Summon Variables 
+var plant_summon_time: float = 2.5
+var plant_summon_timer: float = 2.5
+
 func _ready() -> void:
 	Engine.max_fps = 60.0
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	if plant_summon_timer > 0:
+		plant_summon_timer -= delta
+	else:
+		plant_summon_timer = plant_summon_time
+		for i in 5:
+			summon_plant(math.random_point_in_circle(250.0),rng.randf_range(0.25,0.75))
+			#math.random_point_in_circle()
 	_check_summon_cell_at_mouse()
 	_check_summon_plant_at_mouse()
 	_check_summon_meat_at_mouse()

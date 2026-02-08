@@ -84,7 +84,7 @@ func _ready() -> void:
 		birth_movement_speed = rng.randf_range(0.5,5)
 		birth_scale = rng.randf_range(0.5,1.25)
 		birth_max_hunger = rng.randf_range(5,15)
-		hunger_drain = rng.randf_range(0.5,0.05)
+		hunger_drain = rng.randf_range(0.05,0.005)
 		growth_hunger = rng.randf_range(1,3)
 		birth_hunger = rng.randf_range(1.5, birth_max_hunger * 0.75)
 	
