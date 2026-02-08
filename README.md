@@ -3,6 +3,11 @@
 **Cells** is a project built with the Godot Engine.  
 This repository contains the scenes, scripts, and assets required to open and run the project in the Godot editor.
 
+## ▶ Playable Demo
+
+A playable web demo is available here:  
+👉 https://255-ping.github.io/Cells/
+
 ## 📦 Repository Contents
 
 - `project.godot` — Godot project configuration file  
