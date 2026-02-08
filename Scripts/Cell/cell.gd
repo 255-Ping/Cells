@@ -161,8 +161,8 @@ func _update_stats_panel():
 	"hunger_drain: ", hunger_drain, "\n",
 	"\n",
 	
-	"birth_movement_speed", birth_movement_speed, "\n",
-	"current_movement_speed", current_movement_speed, "\n",
+	"birth_movement_speed: ", birth_movement_speed, "\n",
+	"current_movement_speed: ", current_movement_speed, "\n",
 	"current_x_movement: ", current_x_movement, "\n",
 	"desired_x_movement: ", desired_x_movement, "\n",
 	"current_y_movement: ", current_y_movement, "\n",
