@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cml2iik2kb5i0"]
 
-[ext_resource type="Script" uid="uid://81q38seomhno" path="res://Scripts/plant.gd" id="1_6gypx"]
-[ext_resource type="Texture2D" uid="uid://cjqxtpemp0ee4" path="res://Textures/plant.png" id="1_fgu4o"]
+[ext_resource type="Script" uid="uid://dq6evdqf2f0dp" path="res://Assets/Scripts/WorldObjects/plant.gd" id="1_6gypx"]
+[ext_resource type="Texture2D" uid="uid://cjqxtpemp0ee4" path="res://Assets/Textures/plant.png" id="1_fgu4o"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6gypx"]
 radius = 11.045361

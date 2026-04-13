@@ -4,10 +4,19 @@ class_name Main
 var math = Math.new()
 var rng = RandomNumberGenerator.new()
 
+var max_cells: int = 40
+var current_cells: int = 0
+
+var max_meat: int = 100
+var current_meat: int = 0
+
+var max_plant: int = 100
+var current_plant: int = 0
+
 #Node Variables
-@onready var cell_node = preload("res://Scenes/cell.tscn")
-@onready var plant_node = preload("res://Scenes/plant.tscn")
-@onready var meat_node = preload("res://Scenes/meat.tscn")
+@onready var cell_node = preload("res://Assets/Scenes/cell.tscn")
+@onready var plant_node = preload("res://Assets/Scenes/plant.tscn")
+@onready var meat_node = preload("res://Assets/Scenes/meat.tscn")
 
 #Cell Modifying Variables
 var cell_mutation_rate: float = 1.0
@@ -17,7 +26,7 @@ var plant_summon_time: float = 2.5
 var plant_summon_timer: float = 2.5
 
 func _ready() -> void:
-	Engine.max_fps = 60.0
+	Engine.max_fps = 60
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -58,6 +67,8 @@ func _check_click_on_cells():
 func summon_cell(pos: Vector2, birth_type: String, parent: Node = null):
 	var instance = cell_node.instantiate()
 	instance.global_position = pos
+	if birth_type == "born" and rng.randf_range(0,1) < 0.25:
+		birth_type = birth_type + "-mutate"
 	instance.birth_type = birth_type
 	if parent:
 		instance.parent = parent

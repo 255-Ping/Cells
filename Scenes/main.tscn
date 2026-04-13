@@ -1,9 +1,0 @@
-[gd_scene load_steps=3 format=3 uid="uid://bxjm8g8by244w"]
-
-[ext_resource type="Script" uid="uid://cp85vmllm7vtk" path="res://Scripts/main.gd" id="1_jjgbg"]
-[ext_resource type="PackedScene" uid="uid://bfbd6u6hy630j" path="res://Scenes/camera_controller.tscn" id="2_8gbba"]
-
-[node name="PetriDish" type="Node2D"]
-script = ExtResource("1_jjgbg")
-
-[node name="CameraController" parent="." instance=ExtResource("2_8gbba")]

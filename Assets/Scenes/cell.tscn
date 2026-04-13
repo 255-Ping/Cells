@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://dy7v23qbb67yj"]
 
-[ext_resource type="Script" uid="uid://b25ehul0or7qe" path="res://Scripts/Cell/cell.gd" id="1_da881"]
-[ext_resource type="Texture2D" uid="uid://q8p7ue7reuji" path="res://Textures/cell.png" id="1_efq80"]
-[ext_resource type="FontFile" uid="uid://bknr6fkaj7uy4" path="res://Textures/Fonts/VCR_OSD_MONO_1.001.ttf" id="3_gilj4"]
+[ext_resource type="Script" uid="uid://cmi4laqu42vrj" path="res://Assets/Scripts/Cell/cell.gd" id="1_da881"]
+[ext_resource type="Texture2D" uid="uid://q8p7ue7reuji" path="res://Assets/Textures/cell.png" id="1_efq80"]
+[ext_resource type="FontFile" uid="uid://bknr6fkaj7uy4" path="res://Assets/Textures/Fonts/VCR_OSD_MONO_1.001.ttf" id="3_gilj4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_da881"]
 radius = 25.0

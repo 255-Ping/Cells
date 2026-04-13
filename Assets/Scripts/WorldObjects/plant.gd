@@ -1,9 +1,10 @@
 extends RigidBody2D
-class_name Meat
+class_name Plant
 
 var size: float
 var health: float
-var species_uuid: String = "meat"
+var species_uuid: String = "plant"
+var parent_species_uuid: String = "0"
 
 func _ready() -> void:
 	await get_tree().process_frame

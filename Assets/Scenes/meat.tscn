@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b0vrwv40croxl"]
 
-[ext_resource type="Texture2D" uid="uid://chmr7oygrcfh3" path="res://Textures/meat.png" id="1_7sx37"]
-[ext_resource type="Script" uid="uid://dvnbvt8g7f20q" path="res://Scripts/meat.gd" id="1_p2df8"]
+[ext_resource type="Texture2D" uid="uid://chmr7oygrcfh3" path="res://Assets/Textures/meat.png" id="1_7sx37"]
+[ext_resource type="Script" uid="uid://brgm3eyy1cwjk" path="res://Assets/Scripts/WorldObjects/meat.gd" id="1_p2df8"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_p2df8"]
 radius = 11.045361

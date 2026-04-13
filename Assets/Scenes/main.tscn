@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://bxjm8g8by244w"]
+
+[ext_resource type="Script" uid="uid://b7ejdg235d87w" path="res://Assets/Scripts/main.gd" id="1_jjgbg"]
+[ext_resource type="PackedScene" uid="uid://bfbd6u6hy630j" path="res://Assets/Scenes/camera_controller.tscn" id="2_8gbba"]
+
+[node name="PetriDish" type="Node2D" unique_id=1481378124]
+script = ExtResource("1_jjgbg")
+
+[node name="CameraController" parent="." unique_id=2065754908 instance=ExtResource("2_8gbba")]
+script = null
