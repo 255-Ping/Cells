@@ -15,9 +15,17 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Cells"
+config/description="Cells is a Godot Engine project containing scenes, scripts, and assets for a game or simulation focused on cell-based mechanics, built entirely in GDScript. "
+config/version="0.0.1"
 run/main_scene="uid://bxjm8g8by244w"
+config/use_hidden_project_data_directory=false
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Cells"
 config/features=PackedStringArray("4.6", "GL Compatibility")
-config/icon="res://icon.svg"
+run/max_fps=120
+boot_splash/use_filter=false
+boot_splash/image="uid://chmr7oygrcfh3"
+config/icon="uid://chmr7oygrcfh3"
 
 [display]
 
@@ -25,6 +33,17 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="viewport"
 window/vsync/vsync_mode=0
+
+[file_customization]
+
+folder_colors={
+"res://Assets/": "blue",
+"res://Assets/Fonts/": "pink",
+"res://Assets/Scenes/": "blue",
+"res://Assets/Scripts/": "red",
+"res://Assets/Textures/": "green",
+"res://docs/": "gray"
+}
 
 [global_group]
 
