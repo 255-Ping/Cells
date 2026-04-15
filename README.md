@@ -15,7 +15,9 @@ A playable web demo is available here:
 - `Assets/Scenes/` — Godot scene files (`.tscn`) defining game objects, UI, and structure  
 - `Assets/Scripts/` — GDScript files (`.gd`) containing game logic  
 - `Assets/Textures/` — Image assets used throughout the project  
-- `.gitignore`, `.editorconfig`, `.gitattributes` — project configuration files
+- `docs/` — Contains data for web build  
+- `godot/` — Contains data for the godot editor  
+- `.gitignore`, `.editorconfig`, `.gitattributes`, `export_presets.cfg` — project configuration files
 
 ## 🚀 Getting Started
 
