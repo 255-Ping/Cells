@@ -10,10 +10,11 @@ A playable web demo is available here:
 
 ## 📦 Repository Contents
 
-- `project.godot` — Godot project configuration file  
-- `Scenes/` — Godot scene files (`.tscn`) defining game objects, UI, and structure  
-- `Scripts/` — GDScript files (`.gd`) containing game logic  
-- `Textures/` — Image assets used throughout the project  
+- `project.godot` — Godot project configuration file
+- `Assets/Fonts/` — Font assets used throughout the project  
+- `Assets/Scenes/` — Godot scene files (`.tscn`) defining game objects, UI, and structure  
+- `Assets/Scripts/` — GDScript files (`.gd`) containing game logic  
+- `Assets/Textures/` — Image assets used throughout the project  
 - `.gitignore`, `.editorconfig`, `.gitattributes` — project configuration files
 
 ## 🚀 Getting Started
@@ -27,4 +28,3 @@ A playable web demo is available here:
 1. Clone the repository:
    ```bash
    git clone https://github.com/255-Ping/Cells.git
-
