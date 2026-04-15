@@ -152,6 +152,7 @@ func _process(delta: float) -> void:
 		else:
 			main.summon_meat(global_position, current_scale * 0.6)
 		queue_free()
+		main.current_cells -= 1
 		
 #######################
 #UPDATE STATS UI PANEL#
@@ -209,8 +210,8 @@ func _update_stats_panel():
 func _check_for_birth():
 	
 	if current_hunger >= birth_hunger:
-		main.summon_cell(global_position, "born", self)
-		current_hunger -= birth_hunger	
+		if main.summon_cell(global_position, "born", self):
+			current_hunger -= birth_hunger	
 	
 func _grow(delta: float):
 	#Check for max growth

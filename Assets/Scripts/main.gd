@@ -19,7 +19,7 @@ var current_plant: int = 0
 @onready var meat_node = preload("res://Assets/Scenes/meat.tscn")
 
 #Cell Modifying Variables
-var cell_mutation_rate: float = 1.0
+var cell_mutation_rate: float = 5.0
 
 #Plant Summon Variables 
 var plant_summon_time: float = 2.5
@@ -45,7 +45,8 @@ func _process(delta: float) -> void:
 func _check_summon_cell_at_mouse():
 	if !Input.is_action_just_pressed("spawn_random_cell"):
 		return
-	summon_cell(get_global_mouse_position(), "miracle")
+	if summon_cell(get_global_mouse_position(), "miracle"):
+		print("Cell Summoned!")
 	
 func _check_summon_plant_at_mouse():
 	if !Input.is_action_just_pressed("spawn_plant"):
@@ -64,7 +65,9 @@ func _check_click_on_cells():
 		if area.get_parent().is_in_group("cell") and area.is_in_group("hitbox"):
 			area.get_parent().stats_panel.visible = !area.get_parent().stats_panel.visible
 	
-func summon_cell(pos: Vector2, birth_type: String, parent: Node = null):
+func summon_cell(pos: Vector2, birth_type: String, parent: Node = null) -> bool:
+	if current_cells >= max_cells:
+		return false
 	var instance = cell_node.instantiate()
 	instance.global_position = pos
 	if birth_type == "born" and rng.randf_range(0,1) < 0.25:
@@ -73,6 +76,8 @@ func summon_cell(pos: Vector2, birth_type: String, parent: Node = null):
 	if parent:
 		instance.parent = parent
 	add_child(instance)
+	current_cells += 1
+	return true
 	
 func summon_plant(pos: Vector2, size: float):
 	var instance = plant_node.instantiate()
