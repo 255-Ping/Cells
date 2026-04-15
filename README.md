@@ -10,14 +10,14 @@ A playable web demo is available here:
 
 ## 📦 Repository Contents
 
-- `project.godot` — Godot project configuration file
+- `project.godot`, `export_presets.cfg` — Godot project configuration file
 - `Assets/Fonts/` — Font assets used throughout the project  
 - `Assets/Scenes/` — Godot scene files (`.tscn`) defining game objects, UI, and structure  
 - `Assets/Scripts/` — GDScript files (`.gd`) containing game logic  
 - `Assets/Textures/` — Image assets used throughout the project  
 - `docs/` — Contains data for web build  
 - `godot/` — Contains data for the godot editor  
-- `.gitignore`, `.editorconfig`, `.gitattributes`, `export_presets.cfg` — project configuration files
+- `.gitignore`, `.editorconfig`, `.gitattributes` — project configuration files
 
 ## 🚀 Getting Started
 
