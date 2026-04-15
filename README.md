@@ -5,7 +5,7 @@ This repository contains the scenes, scripts, and assets required to open and ru
 
 ## ▶ Playable Demo
 
-A playable web demo is available here:  
+Play the unstable versions here:  
 👉 https://255-ping.github.io/Cells/
 
 ## 📦 Repository Contents
