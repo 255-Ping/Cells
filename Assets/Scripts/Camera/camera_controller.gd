@@ -6,8 +6,10 @@ var main
 
 func _ready() -> void:
 	main = get_parent()
+	$Camera2D/RootUI/ScaleUI/VersionLabel.text = VersionControl.version
 
 func _process(_delta: float) -> void:
+	#print("test")
 	_camera_movement()
 	
 func _camera_movement():

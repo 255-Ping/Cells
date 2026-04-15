@@ -6,5 +6,4 @@
 [node name="PetriDish" type="Node2D" unique_id=1481378124]
 script = ExtResource("1_jjgbg")
 
-[node name="CameraController" parent="." unique_id=2065754908 instance=ExtResource("2_8gbba")]
-script = null
+[node name="CameraController" parent="." unique_id=2023753891 instance=ExtResource("2_8gbba")]
