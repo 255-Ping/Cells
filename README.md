@@ -5,7 +5,7 @@ This repository contains the scenes, scripts, and assets required to open and ru
 
 ## ▶ Play on Itch
 
-Play on the official builds on Itch.io:
+Play on the official builds on Itch.io:  
 👉 https://255ping.itch.io/cells
 
 ## ▶ Playable Demo
