@@ -24,8 +24,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = -600.0
-offset_bottom = -320.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("3_o14fa")
 
 [node name="VersionLabel" type="Label" parent="Camera2D/RootUI/ScaleUI" unique_id=213094394]
@@ -35,9 +35,9 @@ anchor_top = 8.400001
 anchor_right = 2.95
 anchor_bottom = 9.007
 offset_left = -638.0
-offset_top = 338.0
+offset_top = 334.0
 offset_right = -602.0
-offset_bottom = 361.0
+offset_bottom = 357.0
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "Beta"
