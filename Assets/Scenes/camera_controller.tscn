@@ -41,3 +41,139 @@ offset_bottom = 357.0
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "Beta"
+
+[node name="Button" type="Button" parent="Camera2D/RootUI/ScaleUI" unique_id=1522810407]
+layout_mode = 0
+offset_left = -634.0
+offset_top = -354.0
+offset_right = -564.0
+offset_bottom = -323.0
+text = "Settings"
+
+[node name="Settings" type="Control" parent="Camera2D/RootUI/ScaleUI" unique_id=801974828]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Panel" type="Panel" parent="Camera2D/RootUI/ScaleUI/Settings" unique_id=64091283]
+layout_mode = 0
+offset_left = -634.0
+offset_top = -322.0
+offset_right = -234.0
+offset_bottom = 178.0
+
+[node name="ColorRect" type="ColorRect" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1678114973]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 34.0
+offset_right = 398.0
+offset_bottom = 38.0
+color = Color(0.11119685, 0.11119684, 0.11119684, 1)
+
+[node name="SimSettingsButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1083388489]
+layout_mode = 0
+offset_left = 3.0
+offset_right = 161.0
+offset_bottom = 31.0
+text = "Simulation Settings"
+
+[node name="EngineSettingsButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1640782918]
+layout_mode = 0
+offset_left = 163.0
+offset_right = 289.0
+offset_bottom = 31.0
+text = "Engine Settings"
+
+[node name="SimSettings" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1162725853]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MaxCellsBox" type="SpinBox" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings" unique_id=399626306]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 77.0
+offset_right = 89.5
+offset_bottom = 108.0
+min_value = 1.0
+max_value = 1000.0
+value = 50.0
+
+[node name="Label" type="Label" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MaxCellsBox" unique_id=1833188464]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 2.0
+offset_right = 231.0
+offset_bottom = 25.0
+text = "Max Cells"
+
+[node name="MutChanceSlider" type="HSlider" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings" unique_id=817848578]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 39.0
+offset_right = 154.0
+offset_bottom = 55.0
+tooltip_text = "0.1"
+max_value = 1.0
+step = 0.01
+value = 0.1
+
+[node name="Label" type="Label" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutChanceSlider" unique_id=1862615011]
+layout_mode = 0
+offset_left = 155.0
+offset_top = -4.0
+offset_right = 298.0
+offset_bottom = 19.0
+text = "Cell Mutation Chance"
+
+[node name="MutRateSlider" type="HSlider" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings" unique_id=1524735588]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 58.0
+offset_right = 154.0
+offset_bottom = 74.0
+tooltip_text = "1.0"
+max_value = 25.0
+step = 0.1
+value = 1.0
+
+[node name="Label" type="Label" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutRateSlider" unique_id=449456780]
+layout_mode = 0
+offset_left = 155.0
+offset_top = -4.0
+offset_right = 298.0
+offset_bottom = 19.0
+text = "Cell Mutation Rate"
+
+[node name="EngineSettings" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1173927216]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MaxFPSBox" type="SpinBox" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings" unique_id=1402674533]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 41.0
+offset_right = 89.5
+offset_bottom = 72.0
+min_value = 20.0
+max_value = 9999.0
+value = 60.0
+
+[node name="Label" type="Label" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/MaxFPSBox" unique_id=694345324]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 2.0
+offset_right = 231.0
+offset_bottom = 25.0
+text = "Max FPS"
+
+[connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettingsButton" to="." method="_on_sim_settings_button_pressed"]
+[connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettingsButton" to="." method="_on_engine_settings_button_pressed"]
+[connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MaxCellsBox" to="." method="_on_max_cells_box_value_changed"]
+[connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutChanceSlider" to="." method="_on_mut_chance_slider_value_changed"]
+[connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutRateSlider" to="." method="_on_mut_rate_slider_value_changed"]
+[connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/MaxFPSBox" to="." method="_on_max_fps_box_value_changed"]

@@ -4,7 +4,7 @@ class_name Main
 var math = Math.new()
 var rng = RandomNumberGenerator.new()
 
-var max_cells: int = 40
+var max_cells: int = 50
 var current_cells: int = 0
 
 var max_meat: int = 100
@@ -19,7 +19,8 @@ var current_plant: int = 0
 @onready var meat_node = preload("res://Assets/Scenes/meat.tscn")
 
 #Cell Modifying Variables
-var cell_mutation_rate: float = 5.0
+var cell_mutation_chance: float = 0.1
+var cell_mutation_rate: float = 1.0
 
 #Plant Summon Variables 
 var plant_summon_time: float = 2.5
@@ -70,7 +71,7 @@ func summon_cell(pos: Vector2, birth_type: String, parent: Node = null) -> bool:
 		return false
 	var instance = cell_node.instantiate()
 	instance.global_position = pos
-	if birth_type == "born" and rng.randf_range(0,1) < 0.25:
+	if birth_type == "born" and rng.randf_range(0,1) > cell_mutation_chance:
 		birth_type = birth_type + "-mutate"
 	instance.birth_type = birth_type
 	if parent:

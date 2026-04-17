@@ -1,1 +1,3 @@
 res://Assets/Scenes/camera_controller.tscn
+res://Assets/Scripts/Camera/camera_controller.gd
+res://Assets/Scripts/main.gd

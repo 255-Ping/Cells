@@ -1,4 +1,10 @@
 Control
-Node2D
+ColorRect
+Button
 Label
+SpinBox
+HSlider
+Panel
+TouchScreenButton
+Node2D
 CanvasLayer
