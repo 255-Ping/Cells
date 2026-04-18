@@ -30,6 +30,7 @@ config/icon="uid://chmr7oygrcfh3"
 [autoload]
 
 VersionControl="*uid://duweae80k3n5a"
+WorldWrapper="*uid://d4cim7kmuof5j"
 
 [display]
 

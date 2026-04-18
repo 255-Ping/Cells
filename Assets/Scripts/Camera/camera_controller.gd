@@ -73,6 +73,15 @@ func _on_max_cells_box_value_changed(value: float) -> void:
 	main.max_cells = value
 	print(main.max_cells)
 
+func _on_max_plant_slider_value_changed(value: float) -> void:
+	main.max_plant = value
+	print(main.max_plant)
+	
+	
+func _on_max_meat_slider_value_changed(value: float) -> void:
+	main.max_meat = value
+	print(main.max_meat)
+	
 
 func _on_mut_chance_slider_value_changed(value: float) -> void:
 	main.cell_mutation_rate = value

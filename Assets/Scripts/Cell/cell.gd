@@ -67,6 +67,7 @@ var main
 #READY FUNCTION#
 ################
 func _ready() -> void:
+	WorldWrapper.register(self)
 	main = get_parent()
 	cell_uuid = gcs.create_uuid() #Generate new cell uuid
 	
@@ -477,3 +478,6 @@ func _on_hit_box_area_exited(area: Area2D) -> void:
 			return
 		attackable_targets.erase(area.get_parent())
 	#print(area.get_parent())
+
+func _exit_tree():
+	WorldWrapper.unregister(self)

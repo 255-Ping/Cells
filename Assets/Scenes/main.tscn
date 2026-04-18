@@ -2,8 +2,12 @@
 
 [ext_resource type="Script" uid="uid://b7ejdg235d87w" path="res://Assets/Scripts/main.gd" id="1_jjgbg"]
 [ext_resource type="PackedScene" uid="uid://bfbd6u6hy630j" path="res://Assets/Scenes/camera_controller.tscn" id="2_8gbba"]
+[ext_resource type="Script" uid="uid://s82uqd4faewu" path="res://Assets/Scripts/WorldObjects/black_mesh_instance_2d.gd" id="4_guoxd"]
 
 [node name="PetriDish" type="Node2D" unique_id=1481378124]
 script = ExtResource("1_jjgbg")
 
 [node name="CameraController" parent="." unique_id=2023753891 instance=ExtResource("2_8gbba")]
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="." unique_id=63564155]
+script = ExtResource("4_guoxd")
