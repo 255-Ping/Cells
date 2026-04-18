@@ -21,7 +21,6 @@ Play the unstable versions here:
 - `Assets/Scripts/` — GDScript files (`.gd`) containing game logic  
 - `Assets/Textures/` — Image assets used throughout the project  
 - `docs/` — Contains data for web build  
-- `godot/` — Contains data for the godot editor  
 - `.gitignore`, `.editorconfig`, `.gitattributes` — project configuration files
 
 ## 🚀 Getting Started
