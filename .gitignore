@@ -5,6 +5,7 @@
 # Godot editor data (DO NOT COMMIT)
 .godot/
 *.gd.uid
+godot/
 
 #################################
 # Imports / caches (Godot 3 fallback)

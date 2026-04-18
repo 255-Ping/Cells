@@ -148,9 +148,11 @@ func _process(delta: float) -> void:
 	
 	if current_health <= 0:
 		if current_hunger <= 0:
-			main.summon_meat(global_position, current_scale * 0.3)
+			if main.summon_meat(global_position, current_scale * 0.3):
+				print("Summoned Meat!")
 		else:
-			main.summon_meat(global_position, current_scale * 0.6)
+			if main.summon_meat(global_position, current_scale * 0.6):
+				print("Summoned Meat!")
 		queue_free()
 		main.current_cells -= 1
 		

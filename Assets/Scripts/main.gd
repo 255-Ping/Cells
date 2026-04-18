@@ -36,7 +36,8 @@ func _process(delta: float) -> void:
 	else:
 		plant_summon_timer = plant_summon_time
 		for i in 5:
-			summon_plant(math.random_point_in_circle(250.0),rng.randf_range(0.25,0.75))
+			if summon_plant(math.random_point_in_circle(250.0),rng.randf_range(0.25,0.75)):
+				print("Randomly Summoned Plant!")
 			#math.random_point_in_circle()
 	_check_summon_cell_at_mouse()
 	_check_summon_plant_at_mouse()
@@ -47,17 +48,19 @@ func _check_summon_cell_at_mouse():
 	if !Input.is_action_just_pressed("spawn_random_cell"):
 		return
 	if summon_cell(get_global_mouse_position(), "miracle"):
-		print("Cell Summoned!")
+		print("Miracle Cell Summoned!")
 	
 func _check_summon_plant_at_mouse():
 	if !Input.is_action_just_pressed("spawn_plant"):
 		return
-	summon_plant(get_global_mouse_position(), 1.0)
+	if summon_plant(get_global_mouse_position(), 1.0):
+		print("Plant Summoned!")
 	
 func _check_summon_meat_at_mouse():
 	if !Input.is_action_just_pressed("spawn_meat"):
 		return
-	summon_meat(get_global_mouse_position(), 1.0)
+	if summon_meat(get_global_mouse_position(), 1.0):
+		print("Meat Summoned!")
 	
 func _check_click_on_cells():
 	if !Input.is_action_just_pressed("left_click"):
@@ -80,17 +83,25 @@ func summon_cell(pos: Vector2, birth_type: String, parent: Node = null) -> bool:
 	current_cells += 1
 	return true
 	
-func summon_plant(pos: Vector2, size: float):
+func summon_plant(pos: Vector2, size: float) -> bool:
+	if current_plant >= max_plant:
+		return false
 	var instance = plant_node.instantiate()
 	instance.global_position = pos
 	instance.size = size
 	add_child(instance)
+	current_plant += 1
+	return true
 	
-func summon_meat(pos: Vector2, size: float):
+func summon_meat(pos: Vector2, size: float) -> bool:
+	if current_meat >= max_meat:
+		return false
 	var instance = meat_node.instantiate()
 	instance.global_position = pos
 	instance.size = size
 	add_child(instance)
+	current_meat += 1
+	return true
 	
 func get_areas_at_global_pos(pos: Vector2) -> Array[Area2D]:
 	var space := get_world_2d().direct_space_state
