@@ -66,7 +66,7 @@ func _on_engine_settings_button_pressed() -> void:
 func _on_mut_rate_slider_value_changed(value: float) -> void:
 	main.cell_mutation_rate = value
 	print(main.cell_mutation_rate)
-	$Camera2D/RootUI/ScaleUI/Settings/Panel/MutRateSlider.tooltip_text = str(main.cell_mutation_rate)
+	$Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutRateSlider.tooltip_text = str(main.cell_mutation_rate)
 
 
 func _on_max_cells_box_value_changed(value: float) -> void:
@@ -86,7 +86,7 @@ func _on_max_meat_slider_value_changed(value: float) -> void:
 func _on_mut_chance_slider_value_changed(value: float) -> void:
 	main.cell_mutation_rate = value
 	print(main.cell_mutation_rate)
-	$Camera2D/RootUI/ScaleUI/Settings/Panel/MutChanceSlider.tooltip_text = str(main.cell_mutation_rate)
+	$Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutChanceSlider.tooltip_text = str(main.cell_mutation_rate)
 
 func _on_max_fps_box_value_changed(value: float) -> void:
 	Engine.max_fps = roundi(value)

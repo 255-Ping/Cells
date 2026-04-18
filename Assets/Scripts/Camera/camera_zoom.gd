@@ -2,7 +2,7 @@ extends Camera2D
 
 @export var zoom_speed := 0.1
 @export var min_zoom := 0.5
-@export var max_zoom := 3.0
+@export var max_zoom := 5.0
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

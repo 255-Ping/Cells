@@ -31,6 +31,7 @@ config/icon="uid://chmr7oygrcfh3"
 
 VersionControl="*uid://duweae80k3n5a"
 WorldWrapper="*uid://d4cim7kmuof5j"
+PerformanceMonitor="*uid://csq20rpovs7yk"
 
 [display]
 
@@ -38,6 +39,10 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="viewport"
 window/vsync/vsync_mode=0
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/quarkphysics/plugin.cfg")
 
 [file_customization]
 

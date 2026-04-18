@@ -9,6 +9,13 @@ var gcs = GenerateCellStats.new()
 @onready var vision_node = $VisionRange
 @onready var hit_box_node = $HitBox
 
+#Performance Variables
+var performance_level: String = "HIGH"
+
+var can_move: bool = true
+var can_attack: bool = true
+var can_birth: bool = true
+
 #Identity Variables
 var cell_uuid: String
 var species_uuid: String
@@ -68,6 +75,7 @@ var main
 ################
 func _ready() -> void:
 	WorldWrapper.register(self)
+	PerformanceMonitor.performance_level_changed.connect(_on_perf_changed)
 	main = get_parent()
 	cell_uuid = gcs.create_uuid() #Generate new cell uuid
 	
@@ -140,11 +148,14 @@ func _ready() -> void:
 ##################
 func _process(delta: float) -> void:
 	_update_stats()
-	_move(delta)
-	_attack(delta)
+	if can_move:
+		_move(delta)
+	if can_attack:
+		_attack(delta)
 	_grow(delta)
 	_hunger_check(delta)
-	_check_for_birth()
+	if can_birth:
+		_check_for_birth()
 	_update_stats_panel()
 	
 	if current_health <= 0:
@@ -478,6 +489,30 @@ func _on_hit_box_area_exited(area: Area2D) -> void:
 			return
 		attackable_targets.erase(area.get_parent())
 	#print(area.get_parent())
+	
+func _on_perf_changed(level):
+	match level:
+		PerformanceMonitor.Level.HIGH:
+			can_move = true
+			can_attack = true
+			can_birth = true
+			set_collision_layer_value(1, true)
+		PerformanceMonitor.Level.MEDIUM:
+			can_move = false
+			can_attack = true
+			can_birth = true
+			set_collision_layer_value(1, true)
+		PerformanceMonitor.Level.LOW:
+			can_move = false
+			can_attack = true
+			can_birth = false
+			set_collision_layer_value(1, false)
+		PerformanceMonitor.Level.CRITICAL:
+			can_move = false
+			can_attack = false
+			can_birth = false
+			set_collision_layer_value(1, false)
+			
 
 func _exit_tree():
 	WorldWrapper.unregister(self)
