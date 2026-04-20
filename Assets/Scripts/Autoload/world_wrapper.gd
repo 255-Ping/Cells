@@ -23,7 +23,6 @@ func _physics_process(_delta):
 			continue
 		var dist = node.global_position.length()
 		if dist > world_radius:
-			var overshoot = dist - world_radius
-			node.global_position = node.global_position.normalized() * -(world_radius - overshoot)
+			node.global_position = -node.global_position.normalized() * (world_radius * 0.9)
 	for node in to_remove:
 		tracked_nodes.erase(node)

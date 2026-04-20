@@ -34,8 +34,8 @@ func _process(delta: float) -> void:
 		if spoil_timer <= 0:
 			queue_free()
 			return
-	_panel_anchor.global_rotation = 0.0
 	if stats_panel.visible:
+		_panel_anchor.global_rotation = 0.0
 		_update_stats_panel()
 
 func _build_stats_panel() -> void:
@@ -45,23 +45,22 @@ func _build_stats_panel() -> void:
 	stats_panel = Panel.new()
 	stats_panel.visible = false
 	stats_panel.z_index = 1000
-	stats_panel.offset_left = -130.0
-	stats_panel.offset_top = 10.0
-	stats_panel.offset_right = 130.0
-	stats_panel.offset_bottom = 100.0
+	stats_panel.offset_left = -65.0
+	stats_panel.offset_top = 5.0
+	stats_panel.offset_right = 65.0
+	stats_panel.offset_bottom = 50.0
 	_panel_anchor.add_child(stats_panel)
 
 	var vbox = VBoxContainer.new()
-	vbox.scale = Vector2(0.5, 0.5)
 	vbox.position = Vector2(2, 2)
-	vbox.custom_minimum_size = Vector2(130, 0)
-	vbox.add_theme_constant_override("separation", 6)
+	vbox.custom_minimum_size = Vector2(120, 0)
+	vbox.add_theme_constant_override("separation", 2)
 	stats_panel.add_child(vbox)
 
 	_info_label = Label.new()
 	_info_label.add_theme_font_override("font", font)
-	_info_label.add_theme_font_size_override("font_size", 16)
-	_info_label.custom_minimum_size = Vector2(0, 22)
+	_info_label.add_theme_font_size_override("font_size", 7)
+	_info_label.custom_minimum_size = Vector2(0, 9)
 	vbox.add_child(_info_label)
 
 	_health_bar = _make_bar(vbox, "Health", Color(0.85, 0.2, 0.2), font)
@@ -69,15 +68,15 @@ func _build_stats_panel() -> void:
 
 func _make_bar(parent: Control, label_text: String, bar_color: Color, font: Font) -> ProgressBar:
 	var row = HBoxContainer.new()
-	row.custom_minimum_size = Vector2(0, 22)
-	row.add_theme_constant_override("separation", 4)
+	row.custom_minimum_size = Vector2(0, 10)
+	row.add_theme_constant_override("separation", 2)
 	parent.add_child(row)
 	var lbl = Label.new()
 	lbl.text = label_text
-	lbl.custom_minimum_size = Vector2(38, 0)
+	lbl.custom_minimum_size = Vector2(22, 0)
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	lbl.add_theme_font_override("font", font)
-	lbl.add_theme_font_size_override("font_size", 16)
+	lbl.add_theme_font_size_override("font_size", 7)
 	row.add_child(lbl)
 	var bar = ProgressBar.new()
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL

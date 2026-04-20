@@ -14,15 +14,34 @@ const DRAW_SEGMENTS: int = 64
 
 var rng = RandomNumberGenerator.new()
 var main
+var _spawn_enabled: bool = true
+var _perf_interval_scale: float = 1.0
 
 func _ready():
 	main = get_tree().current_scene
+	PerformanceMonitor.performance_level_changed.connect(_on_perf_changed)
 
 func _process(delta: float):
+	if not _spawn_enabled:
+		return
 	spawn_timer -= delta
 	if spawn_timer <= 0:
-		spawn_timer = spawn_interval
+		spawn_timer = spawn_interval * _perf_interval_scale
 		_spawn_batch()
+
+func _on_perf_changed(level) -> void:
+	match level:
+		PerformanceMonitor.Level.HIGH:
+			_spawn_enabled = true
+			_perf_interval_scale = 1.0
+		PerformanceMonitor.Level.MEDIUM:
+			_spawn_enabled = true
+			_perf_interval_scale = 2.0
+		PerformanceMonitor.Level.LOW:
+			_spawn_enabled = true
+			_perf_interval_scale = 5.0
+		PerformanceMonitor.Level.CRITICAL:
+			_spawn_enabled = false
 
 func _spawn_batch():
 	for i in SPAWN_BATCH:

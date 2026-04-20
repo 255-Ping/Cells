@@ -30,8 +30,8 @@ var parent: Node
 var parent_species_uuid: String
 
 #Targeting Variables
-var targets: Array
-var attackable_targets: Array
+var targets: Array[Node2D]
+var attackable_targets: Array[Node2D]
 
 #Movement Variables
 var current_x_movement: float
@@ -70,6 +70,23 @@ var current_hunger_drain: float
 #Birth Stats (Hunger Drain)
 var birth_hunger_drain: float
 
+#New Birth Stats
+var birth_vision_range: float
+var birth_defense: float
+var birth_lifespan: float
+var birth_flee_threshold: float
+var birth_litter_size: int
+var birth_regen_rate: float
+
+#New Current Stats
+var current_vision_range: float
+var current_defense: float
+var current_lifespan: float
+var current_flee_threshold: float
+var current_litter_size: int
+var current_regen_rate: float
+var current_age: float = 0.0
+
 #Static Stats
 var color: Color
 var damage_cooldown: float
@@ -89,6 +106,11 @@ var _speed_label: Label
 var _damage_label: Label
 var _species_label: Label
 var _parent_species_label: Label
+var _defense_bar: ProgressBar
+var _vision_bar: ProgressBar
+var _age_bar: ProgressBar
+var _regen_bar: ProgressBar
+var _flee_litter_label: Label
 
 ################
 #READY FUNCTION#
@@ -101,13 +123,7 @@ func _ready() -> void:
 	
 #Cell is CREATED
 	if birth_type == "miracle":
-		var diet_selector = rng.randi_range(1,3)
-		if diet_selector == 1:
-			diet_type = "carnivore"
-		if diet_selector == 2:
-			diet_type = "omnivore"
-		if diet_selector == 3:
-			diet_type = "herbivore"
+		diet_type = ["carnivore", "omnivore", "herbivore"][rng.randi() % 3]
 		species_uuid = gcs.create_uuid() #Generate new species uuid
 		parent_species_uuid = gcs.create_uuid()
 		color = Color(rng.randf_range(0.1,0.9),rng.randf_range(0.1,0.9),rng.randf_range(0.1,0.9),1.0)
@@ -123,7 +139,13 @@ func _ready() -> void:
 		growth_hunger = rng.randf_range(1,3)
 		birth_hunger = rng.randf_range(1.5, birth_max_hunger * 0.75)
 		birth_hunger_reserve = rng.randf_range(0.1, 0.5)
-	
+		birth_vision_range = rng.randf_range(0.5, 2.5)
+		birth_defense = rng.randf_range(0.0, 1.5)
+		birth_lifespan = rng.randf_range(30.0, 120.0)
+		birth_flee_threshold = rng.randf_range(0.0, 0.7)
+		birth_litter_size = rng.randi_range(1, 4)
+		birth_regen_rate = rng.randf_range(0.0, 0.05)
+
 #Cell is BORN
 	elif birth_type.contains("born"):
 		if !parent:
@@ -131,12 +153,29 @@ func _ready() -> void:
 		if birth_type.contains("mutate"):
 			species_uuid = gcs.create_uuid()
 			parent_species_uuid = parent.species_uuid
-			color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.0075 * main.cell_mutation_rate)
-			color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.0075 * main.cell_mutation_rate)
-			color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.0075 * main.cell_mutation_rate)
+			color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.075 * main.cell_mutation_rate)
+			color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.075 * main.cell_mutation_rate)
+			color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.075 * main.cell_mutation_rate)
 			var diets = ["herbivore", "omnivore", "carnivore"]
-			diets.erase(parent.diet_type)
 			diet_type = diets[rng.randi() % diets.size()]
+			growth_speed = gcs.create_rand_stat_from_stat(parent.growth_speed, 0.0005 * main.cell_mutation_rate)
+			movement_change = gcs.create_rand_stat_from_stat(parent.movement_change, 0.005 * main.cell_mutation_rate)
+			birth_damage = gcs.create_rand_stat_from_stat(parent.birth_damage, 0.4 * main.cell_mutation_rate)
+			damage_cooldown = gcs.create_rand_stat_from_stat(parent.damage_cooldown, 0.4 * main.cell_mutation_rate)
+			birth_max_health = gcs.create_rand_stat_from_stat(parent.birth_max_health, 0.4 * main.cell_mutation_rate)
+			birth_movement_speed = gcs.create_rand_stat_from_stat(parent.birth_movement_speed, 0.4 * main.cell_mutation_rate)
+			birth_scale = gcs.create_rand_stat_from_stat(parent.birth_scale, 0.15 * main.cell_mutation_rate)
+			birth_max_hunger = gcs.create_rand_stat_from_stat(parent.birth_max_hunger, 0.15 * main.cell_mutation_rate)
+			birth_hunger_drain = gcs.create_rand_stat_from_stat(parent.birth_hunger_drain, 0.005 * main.cell_mutation_rate)
+			growth_hunger = gcs.create_rand_stat_from_stat(parent.growth_hunger, 0.05 * main.cell_mutation_rate)
+			birth_hunger = gcs.create_rand_stat_from_stat(parent.birth_hunger, 0.05 * main.cell_mutation_rate)
+			birth_hunger_reserve = gcs.create_rand_stat_from_stat(parent.birth_hunger_reserve, 0.1 * main.cell_mutation_rate)
+			birth_vision_range = maxf(0.1, gcs.create_rand_stat_from_stat(parent.birth_vision_range, 0.3 * main.cell_mutation_rate))
+			birth_defense = maxf(0.0, gcs.create_rand_stat_from_stat(parent.birth_defense, 0.3 * main.cell_mutation_rate))
+			birth_lifespan = maxf(5.0, gcs.create_rand_stat_from_stat(parent.birth_lifespan, 15.0 * main.cell_mutation_rate))
+			birth_flee_threshold = clampf(gcs.create_rand_stat_from_stat(parent.birth_flee_threshold, 0.15 * main.cell_mutation_rate), 0.0, 0.95)
+			birth_litter_size = maxi(1, roundi(gcs.create_rand_stat_from_stat(parent.birth_litter_size, 0.6 * main.cell_mutation_rate)))
+			birth_regen_rate = maxf(0.0, gcs.create_rand_stat_from_stat(parent.birth_regen_rate, 0.015 * main.cell_mutation_rate))
 		else:
 			species_uuid = parent.species_uuid
 			parent_species_uuid = parent.parent_species_uuid
@@ -144,19 +183,25 @@ func _ready() -> void:
 			color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.0005 * main.cell_mutation_rate)
 			color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.0005 * main.cell_mutation_rate)
 			diet_type = parent.diet_type
-		growth_speed = gcs.create_rand_stat_from_stat(parent.growth_speed, 0.000005 * main.cell_mutation_rate)
-		movement_change = gcs.create_rand_stat_from_stat(parent.movement_change, 0.00005 * main.cell_mutation_rate)
-		birth_damage = gcs.create_rand_stat_from_stat(parent.birth_damage, 0.05 * main.cell_mutation_rate)
-		damage_cooldown = gcs.create_rand_stat_from_stat(parent.damage_cooldown, 0.05 * main.cell_mutation_rate)
-		birth_max_health = gcs.create_rand_stat_from_stat(parent.birth_max_health, 0.05 * main.cell_mutation_rate)
-		birth_movement_speed = gcs.create_rand_stat_from_stat(parent.birth_movement_speed, 0.05 * main.cell_mutation_rate)
-		birth_scale = gcs.create_rand_stat_from_stat(parent.birth_scale, 0.01 * main.cell_mutation_rate)
-		birth_max_hunger = gcs.create_rand_stat_from_stat(parent.birth_max_hunger, 0.005 * main.cell_mutation_rate)
-		birth_hunger_drain = gcs.create_rand_stat_from_stat(parent.birth_hunger_drain, 0.00005 * main.cell_mutation_rate)
-		growth_hunger = gcs.create_rand_stat_from_stat(parent.growth_hunger, 0.0005 * main.cell_mutation_rate)
-		birth_hunger = gcs.create_rand_stat_from_stat(parent.birth_hunger, 0.0005 * main.cell_mutation_rate)
-		birth_hunger_reserve = gcs.create_rand_stat_from_stat(parent.birth_hunger_reserve, 0.005 * main.cell_mutation_rate)
-		
+			growth_speed = gcs.create_rand_stat_from_stat(parent.growth_speed, 0.000005 * main.cell_mutation_rate)
+			movement_change = gcs.create_rand_stat_from_stat(parent.movement_change, 0.00005 * main.cell_mutation_rate)
+			birth_damage = gcs.create_rand_stat_from_stat(parent.birth_damage, 0.005 * main.cell_mutation_rate)
+			damage_cooldown = gcs.create_rand_stat_from_stat(parent.damage_cooldown, 0.005 * main.cell_mutation_rate)
+			birth_max_health = gcs.create_rand_stat_from_stat(parent.birth_max_health, 0.005 * main.cell_mutation_rate)
+			birth_movement_speed = gcs.create_rand_stat_from_stat(parent.birth_movement_speed, 0.005 * main.cell_mutation_rate)
+			birth_scale = gcs.create_rand_stat_from_stat(parent.birth_scale, 0.001 * main.cell_mutation_rate)
+			birth_max_hunger = gcs.create_rand_stat_from_stat(parent.birth_max_hunger, 0.001 * main.cell_mutation_rate)
+			birth_hunger_drain = gcs.create_rand_stat_from_stat(parent.birth_hunger_drain, 0.000005 * main.cell_mutation_rate)
+			growth_hunger = gcs.create_rand_stat_from_stat(parent.growth_hunger, 0.00005 * main.cell_mutation_rate)
+			birth_hunger = gcs.create_rand_stat_from_stat(parent.birth_hunger, 0.00005 * main.cell_mutation_rate)
+			birth_hunger_reserve = gcs.create_rand_stat_from_stat(parent.birth_hunger_reserve, 0.0005 * main.cell_mutation_rate)
+			birth_vision_range = maxf(0.1, gcs.create_rand_stat_from_stat(parent.birth_vision_range, 0.003 * main.cell_mutation_rate))
+			birth_defense = maxf(0.0, gcs.create_rand_stat_from_stat(parent.birth_defense, 0.003 * main.cell_mutation_rate))
+			birth_lifespan = maxf(5.0, gcs.create_rand_stat_from_stat(parent.birth_lifespan, 0.1 * main.cell_mutation_rate))
+			birth_flee_threshold = clampf(gcs.create_rand_stat_from_stat(parent.birth_flee_threshold, 0.001 * main.cell_mutation_rate), 0.0, 0.95)
+			birth_litter_size = maxi(1, roundi(gcs.create_rand_stat_from_stat(parent.birth_litter_size, 0.005 * main.cell_mutation_rate)))
+			birth_regen_rate = maxf(0.0, gcs.create_rand_stat_from_stat(parent.birth_regen_rate, 0.0001 * main.cell_mutation_rate))
+
 #Apply stats to cell
 	$CollisionPolygon2D/Sprite2D.modulate = Color(color)
 	current_damage = birth_damage
@@ -168,6 +213,15 @@ func _ready() -> void:
 	current_max_hunger = birth_max_hunger
 	current_hunger = birth_hunger * 0.5
 	current_hunger_drain = birth_hunger_drain
+	current_vision_range = birth_vision_range
+	current_defense = birth_defense
+	current_lifespan = birth_lifespan
+	current_flee_threshold = birth_flee_threshold
+	current_litter_size = birth_litter_size
+	current_regen_rate = birth_regen_rate
+	scale = Vector2(current_scale, current_scale)
+	vision_node.scale = Vector2(current_vision_range, current_vision_range)
+	queue_redraw()
 	var _sname := ""
 	if not LineageTracker.species.has(species_uuid):
 		if birth_type == "miracle":
@@ -182,7 +236,6 @@ func _ready() -> void:
 #PROCESS FUNCTION#
 ##################
 func _process(delta: float) -> void:
-	_update_stats()
 	if can_move:
 		_move(delta)
 	if can_attack:
@@ -190,11 +243,13 @@ func _process(delta: float) -> void:
 	_grow(delta)
 	if should_check_hunger:
 		_hunger_check(delta)
+	_age(delta)
+	_regen(delta)
 	if can_birth:
 		_check_for_birth()
 	if should_update_stat_panel:
 		_update_stats_panel()
-	
+
 	if current_health <= 0:
 		if current_hunger <= 0:
 			main.summon_meat(global_position, current_scale * 0.3, species_uuid)
@@ -231,6 +286,10 @@ func _build_stats_panel() -> void:
 	_hunger_drain_bar= _make_bar(vbox, "H.Drain",   Color(0.8,  0.45, 0.05), font)
 	_growth_bar      = _make_bar(vbox, "Growth",    Color(0.2,  0.8,  0.3 ), font)
 	_dmg_cooldown_bar= _make_bar(vbox, "Atk.Speed", Color(0.6,  0.1,  0.7 ), font)
+	_defense_bar     = _make_bar(vbox, "Defense",   Color(0.3,  0.5,  0.9 ), font)
+	_vision_bar      = _make_bar(vbox, "Vision",    Color(0.95, 0.95, 0.3 ), font)
+	_age_bar         = _make_bar(vbox, "Age",       Color(0.6,  0.35, 0.75), font)
+	_regen_bar       = _make_bar(vbox, "Regen",     Color(0.2,  0.9,  0.65), font)
 
 	var sep = HSeparator.new()
 	sep.custom_minimum_size = Vector2(0, 30)
@@ -238,6 +297,7 @@ func _build_stats_panel() -> void:
 
 	_speed_label = _make_stat_label(vbox, font)
 	_damage_label = _make_stat_label(vbox, font)
+	_flee_litter_label = _make_stat_label(vbox, font)
 	_species_label = _make_stat_label(vbox, font)
 	_parent_species_label = _make_stat_label(vbox, font)
 
@@ -303,16 +363,46 @@ func _update_stats_panel() -> void:
 	_growth_bar.value = current_growth
 	_dmg_cooldown_bar.max_value = maxf(damage_cooldown, 0.001)
 	_dmg_cooldown_bar.value = damage_cooldown - current_damage_cooldown
+	_defense_bar.max_value = maxf(birth_defense * 3.0, 0.1)
+	_defense_bar.value = current_defense
+	_vision_bar.max_value = 6.0
+	_vision_bar.value = current_vision_range
+	_age_bar.max_value = current_lifespan
+	_age_bar.value = current_age
+	_regen_bar.max_value = maxf(birth_regen_rate * 4.0, 0.0001)
+	_regen_bar.value = current_regen_rate
 	_speed_label.text = str("Speed:   ", snappedf(current_movement_speed, 0.01), "  (birth: ", snappedf(birth_movement_speed, 0.01), ")")
 	_damage_label.text = str("Damage: ", snappedf(current_damage, 0.01), "  (birth: ", snappedf(birth_damage, 0.01), ")")
+	_flee_litter_label.text = str("Flee: ", snappedf(current_flee_threshold * 100.0, 1.0), "%hp   Litter: ", current_litter_size)
 	_species_label.text = str("Species:  ", species_uuid)
 	_parent_species_label.text = str("Parent:    ", parent_species_uuid)
 		
-func _check_for_birth():
-	
+func _draw() -> void:
+	if not stats_panel.visible:
+		return
+	var radius := 25.0 * current_vision_range
+	draw_arc(Vector2.ZERO, radius, 0.0, TAU, 64, Color(color.r, color.g, color.b, 0.18), 1.0, true)
+
+func _check_for_birth() -> void:
 	if current_hunger >= birth_hunger * (1.0 + birth_hunger_reserve):
-		if main.summon_cell(global_position, "born", self):
-			current_hunger -= birth_hunger	
+		for i in current_litter_size:
+			if main.summon_cell(global_position, "born", self):
+				current_hunger -= birth_hunger
+			else:
+				break
+
+func _age(delta: float) -> void:
+	current_age += delta
+	if current_age >= current_lifespan:
+		if current_hunger <= 0:
+			main.summon_meat(global_position, current_scale * 0.3, species_uuid)
+		else:
+			main.summon_meat(global_position, current_scale * 0.6, species_uuid)
+		queue_free()
+
+func _regen(delta: float) -> void:
+	if current_regen_rate > 0 and current_hunger > current_max_hunger * 0.5:
+		current_health = minf(current_health + current_regen_rate * delta, current_max_health)
 	
 func _grow(delta: float):
 	#Check for max growth
@@ -329,6 +419,13 @@ func _grow(delta: float):
 		current_max_health = birth_max_health * (current_growth + 1)
 		current_damage = birth_damage * (current_growth + 1)
 		current_hunger_drain = birth_hunger_drain * (current_growth + 1)
+		current_vision_range = birth_vision_range * (current_growth + 1)
+		current_defense = birth_defense * (current_growth + 1)
+		current_lifespan = birth_lifespan * (current_growth + 1)
+		current_regen_rate = birth_regen_rate * (current_growth + 1)
+		scale = Vector2(current_scale, current_scale)
+		vision_node.scale = Vector2(current_vision_range, current_vision_range)
+		queue_redraw()
 		#Check if hunger greater than 0 to drain
 		if current_hunger > 0:
 			current_hunger -= current_hunger_drain * delta
@@ -343,9 +440,6 @@ func _hunger_check(delta: float):
 	if velocity_average > 0:
 		#Remove hunger
 		current_hunger -= (current_hunger_drain * delta) * (velocity_average * 0.1)
-	
-func _update_stats():
-	scale = Vector2(current_scale,current_scale)
 	
 func _attack(delta: float):
 	if current_damage_cooldown > 0:
@@ -364,8 +458,7 @@ func _attack(delta: float):
 
 	
 func take_damage(amount: float, attacker_node: Node):
-	#print("damaged: ", amount)
-	current_health -= amount
+	current_health -= maxf(0.1, amount - current_defense)
 	damaged += amount
 	attacker = attacker_node
 	#if current_health <= 0:
@@ -380,19 +473,24 @@ func _move(delta: float):
 		var dir = attacker.global_position.direction_to(global_position)
 		velocity = dir * (damaged * 3)
 		damaged -= delta
-		
+
+	elif current_flee_threshold > 0 and current_health < current_max_health * current_flee_threshold and targets.size() > 0:
+		var threat := get_closest_node(self, targets)
+		var dir := threat.global_position.direction_to(global_position)
+		velocity = dir * (current_movement_speed * 2)
+
 	elif targets.size() < 1:
 		if !current_x_movement:
-			current_x_movement = randf_range(-5,5)
+			current_x_movement = rng.randf_range(-5,5)
 			desired_x_movement = current_x_movement
 		if !current_y_movement:
-			current_y_movement = randf_range(-5,5)
+			current_y_movement = rng.randf_range(-5,5)
 			desired_y_movement = current_y_movement
 		
 		if round(desired_x_movement) == round(current_x_movement):
-			desired_x_movement = randf_range(-5,5)
+			desired_x_movement = rng.randf_range(-5,5)
 		if round(desired_y_movement) == round(current_y_movement):
-			desired_y_movement = randf_range(-5,5)
+			desired_y_movement = rng.randf_range(-5,5)
 			
 		if desired_x_movement > current_x_movement:
 			current_x_movement += movement_change
@@ -429,168 +527,59 @@ func get_closest_node(origin: Node2D, nodes: Array) -> Node2D:
 
 
 
-func _on_vision_range_area_entered(area: Area2D) -> void:
-	if diet_type == "carnivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if area.get_parent().species_uuid == parent_species_uuid:
-			return
-		if area.get_parent().parent_species_uuid == species_uuid:
-			return
-		if area.get_parent().parent_species_uuid == parent_species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
-			return
-		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
-			return
-		targets.append(area.get_parent())
-	if diet_type == "omnivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if area.get_parent().species_uuid == parent_species_uuid:
-			return
-		if area.get_parent().parent_species_uuid == species_uuid:
-			return
-		if area.get_parent().parent_species_uuid == parent_species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
-			return
-		targets.append(area.get_parent())
-	if diet_type == "herbivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if !area.get_parent().is_in_group("plant"):
-			return
-		targets.append(area.get_parent())
+func _should_target(entity: Node) -> bool:
+	if entity == self:
+		return false
+	match diet_type:
+		"herbivore":
+			if entity.species_uuid == species_uuid:
+				return false
+			return entity.is_in_group("plant")
+		"carnivore":
+			if entity.species_uuid == species_uuid:
+				return false
+			if entity.species_uuid == parent_species_uuid:
+				return false
+			if entity.parent_species_uuid == species_uuid:
+				return false
+			if entity.parent_species_uuid == parent_species_uuid:
+				return false
+			if entity.is_in_group("meat") and entity.origin_species_uuid == species_uuid:
+				return false
+			return entity.is_in_group("cell") or entity.is_in_group("meat")
+		"omnivore":
+			if entity.species_uuid == species_uuid:
+				return false
+			if entity.species_uuid == parent_species_uuid:
+				return false
+			if entity.parent_species_uuid == species_uuid:
+				return false
+			if entity.parent_species_uuid == parent_species_uuid:
+				return false
+			if entity.is_in_group("meat") and entity.origin_species_uuid == species_uuid:
+				return false
+			return true
+	return false
 
+func _on_vision_range_area_entered(area: Area2D) -> void:
+	if not area.is_in_group("hitbox"):
+		return
+	var entity := area.get_parent()
+	if _should_target(entity):
+		targets.append(entity)
 
 func _on_vision_range_area_exited(area: Area2D) -> void:
-	if diet_type == "carnivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
-			return
-		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
-			return
-		targets.erase(area.get_parent())
-	if diet_type == "omnivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
-			return
-		targets.erase(area.get_parent())
-	if diet_type == "herbivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if !area.get_parent().is_in_group("plant"):
-			return
-		targets.erase(area.get_parent())
-
+	targets.erase(area.get_parent())
 
 func _on_hit_box_area_entered(area: Area2D) -> void:
-	if diet_type == "carnivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if area.get_parent().species_uuid == parent_species_uuid:
-			return
-		if area.get_parent().parent_species_uuid == species_uuid:
-			return
-		if area.get_parent().parent_species_uuid == parent_species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
-			return
-		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
-			return
-		attackable_targets.append(area.get_parent())
-	if diet_type == "omnivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if area.get_parent().species_uuid == parent_species_uuid:
-			return
-		if area.get_parent().parent_species_uuid == species_uuid:
-			return
-		if area.get_parent().parent_species_uuid == parent_species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
-			return
-		attackable_targets.append(area.get_parent())
-	if diet_type == "herbivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if !area.get_parent().is_in_group("plant"):
-			return
-		attackable_targets.append(area.get_parent())
-
+	if not area.is_in_group("hitbox"):
+		return
+	var entity := area.get_parent()
+	if _should_target(entity):
+		attackable_targets.append(entity)
 
 func _on_hit_box_area_exited(area: Area2D) -> void:
-	if diet_type == "carnivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
-			return
-		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
-			return
-		attackable_targets.erase(area.get_parent())
-	if diet_type == "omnivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
-			return
-		attackable_targets.erase(area.get_parent())
-	if diet_type == "herbivore":
-		if area.get_parent() == self:
-			return
-		if area.get_parent().species_uuid == species_uuid:
-			return
-		if !area.is_in_group("hitbox"):
-			return
-		if !area.get_parent().is_in_group("plant"):
-			return
-		attackable_targets.erase(area.get_parent())
+	attackable_targets.erase(area.get_parent())
 	
 func _on_perf_changed(level):
 	match level:

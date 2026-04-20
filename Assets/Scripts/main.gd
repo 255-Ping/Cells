@@ -109,6 +109,8 @@ func _toggle_stats_at(pos: Vector2) -> void:
 		var entity = area.get_parent()
 		if area.is_in_group("hitbox") and (entity.is_in_group("cell") or entity.is_in_group("meat") or entity.is_in_group("plant")):
 			entity.stats_panel.visible = !entity.stats_panel.visible
+			if entity.is_in_group("cell"):
+				entity.queue_redraw()
 
 func _try_start_drag(pos: Vector2) -> void:
 	for area in get_areas_at_global_pos(pos):

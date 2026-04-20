@@ -33,18 +33,22 @@ const BINDABLE_ACTIONS: Array = [
 	["left_click",        "Drag Entity"],
 	["open_stats",        "Open Stats"],
 	["camera_pan",        "Pan Camera"],
+	["pause_simulation",  "Pause"],
 ]
 
 var _rebinding_action: String = ""
 var _rebind_button: Button = null
+var _pause_label: Label
 
 func _ready() -> void:
+	set_process_mode(Node.PROCESS_MODE_ALWAYS)
 	main = get_parent()
 	$Camera2D/RootUI/ScaleUI/VersionLabel.text = VersionControl.version
 	_build_sim_settings()
 	_build_engine_settings()
 	_load_keybinds()
 	_build_keybind_list()
+	_build_pause_label()
 
 func _process(_delta: float) -> void:
 	_camera_movement()
@@ -63,6 +67,21 @@ func _check_sprinting():
 	if Input.is_action_just_released("speed_up"):
 		is_sprinting = false
 
+func _build_pause_label() -> void:
+	_pause_label = Label.new()
+	_pause_label.text = "— PAUSED —"
+	_pause_label.add_theme_font_override("font", preload("res://Assets/Fonts/VCR_OSD_MONO_1.001.ttf"))
+	_pause_label.add_theme_font_size_override("font_size", 20)
+	_pause_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_pause_label.modulate = Color(1.0, 1.0, 0.35)
+	_pause_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_pause_label.offset_left = -70
+	_pause_label.offset_right = 70
+	_pause_label.offset_top = 6
+	_pause_label.offset_bottom = 30
+	_pause_label.visible = false
+	$Camera2D/RootUI.add_child(_pause_label)
+
 func _input(event):
 	if _rebinding_action != "":
 		if (event is InputEventKey or event is InputEventMouseButton) and event.pressed:
@@ -76,6 +95,11 @@ func _input(event):
 			_rebinding_action = ""
 			_rebind_button = null
 			get_viewport().set_input_as_handled()
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.is_action("pause_simulation"):
+		get_tree().paused = !get_tree().paused
+		_pause_label.visible = get_tree().paused
+		get_viewport().set_input_as_handled()
 		return
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_MIDDLE:
