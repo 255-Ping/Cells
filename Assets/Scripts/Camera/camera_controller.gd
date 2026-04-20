@@ -18,6 +18,7 @@ var main
 @onready var leave_panel = $Camera2D/RootUI/ScaleUI/Settings/Panel/LeavePanel
 @onready var sim_settings_list = $Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/ScrollContainer/SimSettingsList
 @onready var engine_settings_list = $Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/ScrollContainer/EngineSettingsList
+@onready var lineage_panel = $UILayer/LineagePanel
 
 const BINDABLE_ACTIONS: Array = [
 	["camera_move_up",    "Move Up"],
@@ -206,6 +207,12 @@ func _on_main_menu_button_pressed() -> void:
 
 func _on_exit_button_pressed() -> void:
 	get_tree().quit()
+
+func _on_lineage_button_pressed() -> void:
+	if lineage_panel.visible:
+		lineage_panel.visible = false
+	else:
+		lineage_panel.open()
 
 func _on_button_pressed() -> void:
 	settings.visible = !settings.visible

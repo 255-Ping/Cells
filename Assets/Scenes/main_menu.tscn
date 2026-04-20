@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cells_main_menu"]
 
 [ext_resource type="Script" path="res://Assets/Scripts/main_menu.gd" id="1_menu"]
-[ext_resource type="FontFile" uid="uid://bknr8fkaj7uy4" path="res://Assets/Fonts/VCR_OSD_MONO_1.001.ttf" id="2_font"]
+[ext_resource type="FontFile" path="res://Assets/Fonts/VCR_OSD_MONO_1.001.ttf" id="2_font"]
 
 [node name="MainMenu" type="Node"]
 script = ExtResource("1_menu")

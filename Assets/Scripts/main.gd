@@ -132,7 +132,7 @@ func summon_cell(pos: Vector2, birth_type: String, parent: Node = null) -> bool:
 		return false
 	var instance = cell_node.instantiate()
 	instance.global_position = pos
-	if birth_type == "born" and rng.randf_range(0,1) > cell_mutation_chance:
+	if birth_type == "born" and rng.randf_range(0,1) < cell_mutation_chance:
 		birth_type = birth_type + "-mutate"
 	instance.birth_type = birth_type
 	if parent:

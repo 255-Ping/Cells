@@ -33,6 +33,8 @@ VersionControl="*uid://duweae80k3n5a"
 WorldWrapper="*uid://d4cim7kmuof5j"
 PerformanceMonitor="*uid://csq20rpovs7yk"
 SaveManager="*res://Assets/Scripts/Autoload/save_manager.gd"
+LineageTracker="*res://Assets/Scripts/Autoload/lineage_tracker.gd"
+NameGenerator="*res://Assets/Scripts/Autoload/name_generator.gd"
 
 [display]
 

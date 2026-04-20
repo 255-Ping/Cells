@@ -78,6 +78,7 @@ var damage_cooldown: float
 var main
 
 @onready var stats_panel = $Panel
+var _name_label: Label
 var _info_label: Label
 var _health_bar: ProgressBar
 var _hunger_bar: ProgressBar
@@ -167,6 +168,14 @@ func _ready() -> void:
 	current_max_hunger = birth_max_hunger
 	current_hunger = birth_hunger * 0.5
 	current_hunger_drain = birth_hunger_drain
+	var _sname := ""
+	if not LineageTracker.species.has(species_uuid):
+		if birth_type == "miracle":
+			_sname = NameGenerator.new_name()
+		else:
+			var _pdata: Dictionary = LineageTracker.species.get(parent_species_uuid, {})
+			_sname = NameGenerator.mutate_name(_pdata.get("name", ""))
+	LineageTracker.register_birth(species_uuid, parent_species_uuid, color, diet_type, _sname)
 	_build_stats_panel()
 
 ##################
@@ -204,6 +213,12 @@ func _build_stats_panel() -> void:
 	vbox.custom_minimum_size = Vector2(2267, 0)
 	vbox.add_theme_constant_override("separation", 12)
 	stats_panel.add_child(vbox)
+
+	_name_label = Label.new()
+	_name_label.add_theme_font_override("font", font)
+	_name_label.add_theme_font_size_override("font_size", 72)
+	_name_label.custom_minimum_size = Vector2(0, 110)
+	vbox.add_child(_name_label)
 
 	_info_label = Label.new()
 	_info_label.add_theme_font_override("font", font)
@@ -275,6 +290,8 @@ func _make_stat_label(container: Control, font: Font) -> Label:
 func _update_stats_panel() -> void:
 	if !_info_label:
 		return
+	var _sp_data: Dictionary = LineageTracker.species.get(species_uuid, {})
+	_name_label.text = _sp_data.get("name", "unknown")
 	_info_label.text = str(diet_type.to_upper(), "  |  sz: ", snappedf(current_scale, 0.01), "  |  hp: ", snappedf(current_health, 0.1), "/", snappedf(current_max_health, 0.1))
 	_health_bar.max_value = current_max_health
 	_health_bar.value = current_health
@@ -611,3 +628,4 @@ func _exit_tree():
 	WorldWrapper.unregister(self)
 	if is_instance_valid(main):
 		main.current_cells -= 1
+	LineageTracker.on_cell_died(species_uuid)
