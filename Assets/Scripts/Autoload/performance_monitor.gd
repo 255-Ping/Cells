@@ -1,14 +1,14 @@
 extends Node
 
-# Downgrade thresholds (FPS falling)
-const FPS_DROP_TO_MEDIUM   = 52
-const FPS_DROP_TO_LOW      = 38
-const FPS_DROP_TO_CRITICAL = 23
+# Downgrade thresholds (FPS falling) — scaled from target FPS
+var FPS_DROP_TO_MEDIUM   = 52
+var FPS_DROP_TO_LOW      = 38
+var FPS_DROP_TO_CRITICAL = 23
 
 # Upgrade thresholds (FPS recovering) — higher than drop thresholds to prevent thrashing
-const FPS_RISE_TO_HIGH     = 57
-const FPS_RISE_TO_MEDIUM   = 43
-const FPS_RISE_TO_LOW      = 28
+var FPS_RISE_TO_HIGH     = 57
+var FPS_RISE_TO_MEDIUM   = 43
+var FPS_RISE_TO_LOW      = 28
 
 const UPGRADE_HOLD_TIME = 5.0  # Seconds before allowing an upgrade
 const WARMUP_TIME = 3.0        # Seconds to ignore FPS after launch
@@ -23,6 +23,14 @@ var smoothed_fps: float = 60.0
 const SMOOTH_FACTOR = 0.05  # Lower = slower to react, more stable
 
 signal performance_level_changed(new_level)
+
+func set_target_fps(fps: float) -> void:
+	FPS_DROP_TO_MEDIUM   = fps * 0.867
+	FPS_DROP_TO_LOW      = fps * 0.633
+	FPS_DROP_TO_CRITICAL = fps * 0.383
+	FPS_RISE_TO_HIGH     = fps * 0.950
+	FPS_RISE_TO_MEDIUM   = fps * 0.717
+	FPS_RISE_TO_LOW      = fps * 0.467
 
 func _process(delta):
 	if warmup_timer > 0:

@@ -67,7 +67,7 @@ func _process(_delta: float) -> void:
 	_check_click_on_cells()
 	
 func _check_summon_cell_at_mouse():
-	if !Input.is_action_just_pressed("spawn_random_cell"):
+	if !Input.is_action_pressed("spawn_random_cell"):
 		return
 	summon_cell(get_global_mouse_position(), "miracle")
 	

@@ -182,6 +182,13 @@ func _on_mut_chance_slider_value_changed(value: float) -> void:
 
 func _on_max_fps_box_value_changed(value: float) -> void:
 	Engine.max_fps = roundi(value)
+	PerformanceMonitor.set_target_fps(value)
+
+func _on_window_mode_option_item_selected(index: int) -> void:
+	match index:
+		0: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		1: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		2: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
 
 func _on_world_radius_box_value_changed(value: float) -> void:
 	WorldWrapper.set_world_radius(value)

@@ -67,7 +67,7 @@ offset_bottom = 246.0
 layout_mode = 0
 offset_left = 2.0
 offset_top = 34.0
-offset_right = 398.0
+offset_right = 448.0
 offset_bottom = 38.0
 color = Color(0.11119685, 0.11119684, 0.11119684, 1)
 
@@ -93,6 +93,7 @@ offset_bottom = 31.0
 text = "Plant Spawners"
 
 [node name="SimSettings" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1162725853]
+visible = false
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -232,8 +233,30 @@ offset_right = 231.0
 offset_bottom = 25.0
 text = "Max FPS"
 
+[node name="WindowModeOption" type="OptionButton" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings" unique_id=1900100001]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 75.0
+offset_right = 180.0
+offset_bottom = 103.0
+selected = 0
+item_count = 3
+popup/item_0/text = "Windowed"
+popup/item_0/id = 0
+popup/item_1/text = "Fullscreen"
+popup/item_1/id = 1
+popup/item_2/text = "Fullscreen Windowed"
+popup/item_2/id = 2
+
+[node name="Label" type="Label" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/WindowModeOption" unique_id=1900100002]
+layout_mode = 0
+offset_left = 201.0
+offset_top = 2.0
+offset_right = 344.0
+offset_bottom = 25.0
+text = "Window Mode"
+
 [node name="PlantSpawners" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1900000002]
-visible = false
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -251,7 +274,7 @@ layout_mode = 0
 offset_left = 3.0
 offset_top = 73.0
 offset_right = 447.0
-offset_bottom = 243.0
+offset_bottom = 565.0
 
 [node name="SpawnerList" type="VBoxContainer" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawners/ScrollContainer" unique_id=1900000005]
 layout_mode = 2
@@ -268,4 +291,5 @@ size_flags_horizontal = 3
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutRateSlider" to="." method="_on_mut_rate_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/WorldRadiusBox" to="." method="_on_world_radius_box_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/MaxFPSBox" to="." method="_on_max_fps_box_value_changed"]
+[connection signal="item_selected" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/WindowModeOption" to="." method="_on_window_mode_option_item_selected"]
 [connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawners/AddSpawnerButton" to="." method="_on_add_spawner_button_pressed"]
