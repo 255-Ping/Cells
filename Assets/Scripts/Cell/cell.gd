@@ -1,6 +1,8 @@
 extends CharacterBody2D
 class_name Cell
 
+const FONT = preload("res://Assets/Fonts/VCR_OSD_MONO_1.001.ttf")
+
 var rng = RandomNumberGenerator.new()
 var gcs = GenerateCellStats.new()
 
@@ -190,13 +192,12 @@ func _process(delta: float) -> void:
 		else:
 			main.summon_meat(global_position, current_scale * 0.6, species_uuid)
 		queue_free()
-		main.current_cells -= 1
 		
 #######################
 #UPDATE STATS UI PANEL#
 #######################
 func _build_stats_panel() -> void:
-	var font: Font = load("res://Assets/Fonts/VCR_OSD_MONO_1.001.ttf")
+	var font: Font = FONT
 	var vbox = VBoxContainer.new()
 	vbox.scale = Vector2(0.075, 0.075)
 	vbox.position = Vector2(4, 4)
@@ -608,3 +609,5 @@ func _on_perf_changed(level):
 
 func _exit_tree():
 	WorldWrapper.unregister(self)
+	if is_instance_valid(main):
+		main.current_cells -= 1

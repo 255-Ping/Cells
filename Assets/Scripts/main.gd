@@ -23,6 +23,7 @@ var current_plant: int = 0
 var plant_spawners: Array = []
 
 var dragged_entity: Node = null
+var _extinction_timer: float = 0.0
 
 #Cell Modifying Variables
 var cell_mutation_chance: float = 0.03
@@ -80,6 +81,13 @@ func _process(delta: float) -> void:
 	_check_summon_meat_at_mouse()
 	if dragged_entity and is_instance_valid(dragged_entity):
 		dragged_entity.global_position = get_global_mouse_position()
+	if current_cells == 0:
+		_extinction_timer += delta
+		if _extinction_timer >= 5.0:
+			_extinction_timer = 0.0
+			summon_cell(Vector2.ZERO, "miracle")
+	else:
+		_extinction_timer = 0.0
 	
 func _check_summon_cell_at_mouse():
 	var triggered = Input.is_action_pressed("spawn_random_cell") if spawn_hold_mode else Input.is_action_just_pressed("spawn_random_cell")

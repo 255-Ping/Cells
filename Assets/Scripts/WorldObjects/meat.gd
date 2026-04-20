@@ -1,6 +1,8 @@
 extends RigidBody2D
 class_name Meat
 
+const FONT = preload("res://Assets/Fonts/VCR_OSD_MONO_1.001.ttf")
+
 var size: float
 var health: float
 var species_uuid: String = "meat"
@@ -30,7 +32,6 @@ func _process(delta: float) -> void:
 	if main.meat_spoil_time > 0:
 		spoil_timer -= delta
 		if spoil_timer <= 0:
-			main.current_meat -= 1
 			queue_free()
 			return
 	_panel_anchor.global_rotation = 0.0
@@ -38,7 +39,7 @@ func _process(delta: float) -> void:
 		_update_stats_panel()
 
 func _build_stats_panel() -> void:
-	var font: Font = load("res://Assets/Fonts/VCR_OSD_MONO_1.001.ttf")
+	var font: Font = FONT
 	_panel_anchor = Node2D.new()
 	add_child(_panel_anchor)
 	stats_panel = Panel.new()
@@ -109,7 +110,6 @@ func _update_stats_panel() -> void:
 func take_damage(amount: float, _attacker_node: Node):
 	health -= amount
 	if health <= 0:
-		main.current_meat -= 1
 		queue_free()
 		
 func _on_perf_changed(level):
@@ -125,3 +125,5 @@ func _on_perf_changed(level):
 
 func _exit_tree():
 	WorldWrapper.unregister(self)
+	if is_instance_valid(main):
+		main.current_meat -= 1
