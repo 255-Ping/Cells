@@ -25,6 +25,8 @@ var plant_spawners: Array = []
 #Cell Modifying Variables
 var cell_mutation_chance: float = 0.03
 var cell_mutation_rate: float = 1.0
+var meat_spoil_time: float = 30.0
+var plant_spoil_time: float = 0.0
 
 func _ready() -> void:
 	Engine.max_fps = 60
@@ -86,6 +88,10 @@ func _check_click_on_cells():
 		return
 	for area in get_areas_at_global_pos(get_global_mouse_position()):
 		if area.get_parent().is_in_group("cell") and area.is_in_group("hitbox"):
+			area.get_parent().stats_panel.visible = !area.get_parent().stats_panel.visible
+		if area.get_parent().is_in_group("meat") and area.is_in_group("hitbox"):
+			area.get_parent().stats_panel.visible = !area.get_parent().stats_panel.visible
+		if area.get_parent().is_in_group("plant") and area.is_in_group("hitbox"):
 			area.get_parent().stats_panel.visible = !area.get_parent().stats_panel.visible
 	
 func summon_cell(pos: Vector2, birth_type: String, parent: Node = null) -> bool:

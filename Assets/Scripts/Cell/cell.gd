@@ -76,6 +76,16 @@ var damage_cooldown: float
 var main
 
 @onready var stats_panel = $Panel
+var _info_label: Label
+var _health_bar: ProgressBar
+var _hunger_bar: ProgressBar
+var _hunger_drain_bar: ProgressBar
+var _growth_bar: ProgressBar
+var _dmg_cooldown_bar: ProgressBar
+var _speed_label: Label
+var _damage_label: Label
+var _species_label: Label
+var _parent_species_label: Label
 
 ################
 #READY FUNCTION#
@@ -121,13 +131,16 @@ func _ready() -> void:
 			color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.0075 * main.cell_mutation_rate)
 			color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.0075 * main.cell_mutation_rate)
 			color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.0075 * main.cell_mutation_rate)
+			var diets = ["herbivore", "omnivore", "carnivore"]
+			diets.erase(parent.diet_type)
+			diet_type = diets[rng.randi() % diets.size()]
 		else:
 			species_uuid = parent.species_uuid
 			parent_species_uuid = parent.parent_species_uuid
 			color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.0005 * main.cell_mutation_rate)
 			color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.0005 * main.cell_mutation_rate)
 			color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.0005 * main.cell_mutation_rate)
-		diet_type = parent.diet_type
+			diet_type = parent.diet_type
 		growth_speed = gcs.create_rand_stat_from_stat(parent.growth_speed, 0.000005 * main.cell_mutation_rate)
 		movement_change = gcs.create_rand_stat_from_stat(parent.movement_change, 0.00005 * main.cell_mutation_rate)
 		birth_damage = gcs.create_rand_stat_from_stat(parent.birth_damage, 0.05 * main.cell_mutation_rate)
@@ -152,7 +165,8 @@ func _ready() -> void:
 	current_max_hunger = birth_max_hunger
 	current_hunger = birth_hunger * 0.5
 	current_hunger_drain = birth_hunger_drain
-	
+	_build_stats_panel()
+
 ##################
 #PROCESS FUNCTION#
 ##################
@@ -181,57 +195,100 @@ func _process(delta: float) -> void:
 #######################
 #UPDATE STATS UI PANEL#
 #######################
-func _update_stats_panel():
-	$Panel/Label.text = str("cell_uuid: ", cell_uuid, "\n",
-	"species_uuid: ", species_uuid, "\n",
-	"parent_species_uuid: ", parent_species_uuid, "\n",
-	"diet_type: ", diet_type, "\n",
-	"birth_type: ", birth_type, "\n",
-	"parent: ", parent, "\n",
-	"\n",
-	
-	"current_health: ", current_health, "\n",
-	"current_max_health: ", current_max_health, "\n",
-	"birth_max_health: ", birth_max_health, "\n",
-	"\n",
-	
-	"current_growth: ", current_growth, "\n",
-	"growth_speed: ", growth_speed, "\n",
-	"growth_hunger: ", growth_hunger, "\n",
-	"\n",
-	
-	"current_hunger: ", current_hunger, "\n",
-	"current_max_hunger: ", current_max_hunger, "\n",
-	"birth_max_hunger: ", birth_max_hunger, "\n",
-	"birth_hunger_reserve: ", birth_hunger_reserve, "\n",
-	"birth_hunger_drain: ", birth_hunger_drain, "\n",
-	"current_hunger_drain: ", current_hunger_drain, "\n",
-	"\n",
-	
-	"birth_movement_speed: ", birth_movement_speed, "\n",
-	"current_movement_speed: ", current_movement_speed, "\n",
-	"current_x_movement: ", current_x_movement, "\n",
-	"desired_x_movement: ", desired_x_movement, "\n",
-	"current_y_movement: ", current_y_movement, "\n",
-	"desired_y_movement: ", desired_y_movement, "\n",
-	"velocity: ", velocity, "\n",
-	"movement_change: ", movement_change, "\n",
-	"\n",
-	
-	"damaged: ", damaged, "\n",
-	"\n",
-	
-	"birth_scale: ", birth_scale, "\n",
-	"current_scale: ", current_scale, "\n",
-	"\n",
+func _build_stats_panel() -> void:
+	var font: Font = load("res://Assets/Fonts/VCR_OSD_MONO_1.001.ttf")
+	var vbox = VBoxContainer.new()
+	vbox.scale = Vector2(0.075, 0.075)
+	vbox.position = Vector2(4, 4)
+	vbox.custom_minimum_size = Vector2(2267, 0)
+	vbox.add_theme_constant_override("separation", 12)
+	stats_panel.add_child(vbox)
 
-	"birth_damage: ", birth_damage, "\n",
-	"current_damage: ", current_damage, "\n",
-	"damage_cooldown: ", damage_cooldown, "\n",
-	"current_damage_cooldown: ", current_damage_cooldown, "\n",
-	"\n",
-	
-	"color: ", color, "\n")
+	_info_label = Label.new()
+	_info_label.add_theme_font_override("font", font)
+	_info_label.add_theme_font_size_override("font_size", 64)
+	_info_label.custom_minimum_size = Vector2(0, 100)
+	vbox.add_child(_info_label)
+
+	_health_bar      = _make_bar(vbox, "Health",    Color(0.85, 0.2,  0.2 ), font)
+	_hunger_bar      = _make_bar(vbox, "Hunger",    Color(0.9,  0.6,  0.1 ), font)
+	_hunger_drain_bar= _make_bar(vbox, "H.Drain",   Color(0.8,  0.45, 0.05), font)
+	_growth_bar      = _make_bar(vbox, "Growth",    Color(0.2,  0.8,  0.3 ), font)
+	_dmg_cooldown_bar= _make_bar(vbox, "Atk.Speed", Color(0.6,  0.1,  0.7 ), font)
+
+	var sep = HSeparator.new()
+	sep.custom_minimum_size = Vector2(0, 30)
+	vbox.add_child(sep)
+
+	_speed_label = _make_stat_label(vbox, font)
+	_damage_label = _make_stat_label(vbox, font)
+	_species_label = _make_stat_label(vbox, font)
+	_parent_species_label = _make_stat_label(vbox, font)
+
+func _make_bar(container: Control, label_text: String, bar_color: Color, font: Font) -> ProgressBar:
+	var row = HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 260)
+	row.add_theme_constant_override("separation", 20)
+	container.add_child(row)
+
+	var lbl = Label.new()
+	lbl.text = label_text
+	lbl.custom_minimum_size = Vector2(380, 0)
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.add_theme_font_override("font", font)
+	lbl.add_theme_font_size_override("font_size", 56)
+	row.add_child(lbl)
+
+	var bar = ProgressBar.new()
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bar.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	bar.show_percentage = false
+
+	var bg = StyleBoxFlat.new()
+	bg.bg_color = Color(0.15, 0.15, 0.15)
+	bg.corner_radius_top_left = 8
+	bg.corner_radius_top_right = 8
+	bg.corner_radius_bottom_left = 8
+	bg.corner_radius_bottom_right = 8
+	bar.add_theme_stylebox_override("background", bg)
+
+	var fill = StyleBoxFlat.new()
+	fill.bg_color = bar_color
+	fill.corner_radius_top_left = 8
+	fill.corner_radius_top_right = 8
+	fill.corner_radius_bottom_left = 8
+	fill.corner_radius_bottom_right = 8
+	bar.add_theme_stylebox_override("fill", fill)
+	row.add_child(bar)
+	return bar
+
+func _make_stat_label(container: Control, font: Font) -> Label:
+	var lbl = Label.new()
+	lbl.custom_minimum_size = Vector2(0, 160)
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.add_theme_font_override("font", font)
+	lbl.add_theme_font_size_override("font_size", 56)
+	container.add_child(lbl)
+	return lbl
+
+func _update_stats_panel() -> void:
+	if !_info_label:
+		return
+	_info_label.text = str(diet_type.to_upper(), "  |  sz: ", snappedf(current_scale, 0.01), "  |  hp: ", snappedf(current_health, 0.1), "/", snappedf(current_max_health, 0.1))
+	_health_bar.max_value = current_max_health
+	_health_bar.value = current_health
+	_hunger_bar.max_value = current_max_hunger
+	_hunger_bar.value = current_hunger
+	_hunger_drain_bar.max_value = maxf(birth_hunger_drain * 4.0, 0.0001)
+	_hunger_drain_bar.value = current_hunger_drain
+	_growth_bar.max_value = 1.0
+	_growth_bar.value = current_growth
+	_dmg_cooldown_bar.max_value = maxf(damage_cooldown, 0.001)
+	_dmg_cooldown_bar.value = damage_cooldown - current_damage_cooldown
+	_speed_label.text = str("Speed:   ", snappedf(current_movement_speed, 0.01), "  (birth: ", snappedf(birth_movement_speed, 0.01), ")")
+	_damage_label.text = str("Damage: ", snappedf(current_damage, 0.01), "  (birth: ", snappedf(birth_damage, 0.01), ")")
+	_species_label.text = str("Species:  ", species_uuid)
+	_parent_species_label.text = str("Parent:    ", parent_species_uuid)
 		
 func _check_for_birth():
 	

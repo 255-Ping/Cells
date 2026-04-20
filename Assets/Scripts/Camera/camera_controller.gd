@@ -3,6 +3,8 @@ class_name CameraController
 
 var camera_speed: float = 1.0
 var is_sprinting: bool = false
+var is_panning: bool = false
+var pan_last_position: Vector2
 
 var main
 
@@ -11,10 +13,30 @@ var main
 @onready var engine_settings = $Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings
 @onready var plant_spawners_panel = $Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawners
 @onready var spawner_list = $Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawners/ScrollContainer/SpawnerList
+@onready var keybinds_panel = $Camera2D/RootUI/ScaleUI/Settings/Panel/KeybindsPanel
+@onready var keybind_list = $Camera2D/RootUI/ScaleUI/Settings/Panel/KeybindsPanel/ScrollContainer/KeybindList
+@onready var leave_panel = $Camera2D/RootUI/ScaleUI/Settings/Panel/LeavePanel
+
+const BINDABLE_ACTIONS: Array = [
+	["camera_move_up",    "Move Up"],
+	["camera_move_down",  "Move Down"],
+	["camera_move_left",  "Move Left"],
+	["camera_move_right", "Move Right"],
+	["speed_up",          "Sprint"],
+	["select_speed",      "Speed Select"],
+	["spawn_random_cell", "Spawn Cell"],
+	["spawn_plant",       "Spawn Plant"],
+	["spawn_meat",        "Spawn Meat"],
+	["left_click",        "Click / Select"],
+]
+
+var _rebinding_action: String = ""
+var _rebind_button: Button = null
 
 func _ready() -> void:
 	main = get_parent()
 	$Camera2D/RootUI/ScaleUI/VersionLabel.text = VersionControl.version
+	_build_keybind_list()
 
 func _process(_delta: float) -> void:
 	_camera_movement()
@@ -34,6 +56,26 @@ func _check_sprinting():
 		is_sprinting = false
 
 func _input(event):
+	if _rebinding_action != "":
+		if (event is InputEventKey or event is InputEventMouseButton) and event.pressed:
+			if event is InputEventKey and event.physical_keycode == KEY_ESCAPE:
+				_rebind_button.text = _get_action_string(_rebinding_action)
+			else:
+				InputMap.action_erase_events(_rebinding_action)
+				InputMap.action_add_event(_rebinding_action, event)
+				_rebind_button.text = _get_action_string(_rebinding_action)
+			_rebinding_action = ""
+			_rebind_button = null
+			get_viewport().set_input_as_handled()
+		return
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_MIDDLE:
+			is_panning = event.pressed
+			pan_last_position = event.position
+	if event is InputEventMouseMotion and is_panning:
+		var zoom = $Camera2D.zoom
+		global_position -= (event.position - pan_last_position) / zoom
+		pan_last_position = event.position
 	if Input.is_action_pressed("select_speed"):
 		if event is InputEventKey and event.pressed:
 			match event.keycode:
@@ -51,23 +93,89 @@ func set_camera_speed(value: float):
 	print("Camera Speed set to ", value)
 	camera_speed = value
 
+func _build_keybind_list() -> void:
+	for entry in BINDABLE_ACTIONS:
+		var action: String = entry[0]
+		var label_text: String = entry[1]
+		var row = HBoxContainer.new()
+		row.custom_minimum_size = Vector2(0, 28)
+		keybind_list.add_child(row)
+		var lbl = Label.new()
+		lbl.text = label_text
+		lbl.custom_minimum_size = Vector2(140, 0)
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		row.add_child(lbl)
+		var btn = Button.new()
+		btn.text = _get_action_string(action)
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var captured = action
+		btn.pressed.connect(func(): _start_rebind(captured, btn))
+		if action == "select_speed":
+			btn.tooltip_text = "Hold this key and press 1–9 to set camera speed."
+		row.add_child(btn)
+
+func _get_action_string(action: String) -> String:
+	var events = InputMap.action_get_events(action)
+	if events.is_empty():
+		return "None"
+	var event = events[0]
+	if event is InputEventKey:
+		return OS.get_keycode_string(event.physical_keycode)
+	if event is InputEventMouseButton:
+		match event.button_index:
+			MOUSE_BUTTON_LEFT:   return "LMB"
+			MOUSE_BUTTON_RIGHT:  return "RMB"
+			MOUSE_BUTTON_MIDDLE: return "MMB"
+			_: return "Mouse %d" % event.button_index
+	return "Unknown"
+
+func _start_rebind(action: String, btn: Button) -> void:
+	if _rebinding_action != "":
+		_rebind_button.text = _get_action_string(_rebinding_action)
+	_rebinding_action = action
+	_rebind_button = btn
+	btn.text = "[ press key ]"
+
+func _on_keybinds_button_pressed() -> void:
+	var was_visible = keybinds_panel.visible
+	_hide_all_panels()
+	keybinds_panel.visible = !was_visible
+
+func _on_leave_button_pressed() -> void:
+	var was_visible = leave_panel.visible
+	_hide_all_panels()
+	leave_panel.visible = !was_visible
+
+func _on_main_menu_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://Assets/Scenes/main_menu.tscn")
+
+func _on_exit_button_pressed() -> void:
+	get_tree().quit()
+
 func _on_button_pressed() -> void:
 	settings.visible = !settings.visible
 
-func _on_sim_settings_button_pressed() -> void:
-	sim_settings.visible = !sim_settings.visible
+func _hide_all_panels() -> void:
+	sim_settings.visible = false
 	engine_settings.visible = false
 	plant_spawners_panel.visible = false
+	keybinds_panel.visible = false
+	leave_panel.visible = false
+
+func _on_sim_settings_button_pressed() -> void:
+	var was_visible = sim_settings.visible
+	_hide_all_panels()
+	sim_settings.visible = !was_visible
 
 func _on_engine_settings_button_pressed() -> void:
-	engine_settings.visible = !engine_settings.visible
-	sim_settings.visible = false
-	plant_spawners_panel.visible = false
+	var was_visible = engine_settings.visible
+	_hide_all_panels()
+	engine_settings.visible = !was_visible
 
 func _on_plant_spawners_button_pressed() -> void:
-	plant_spawners_panel.visible = !plant_spawners_panel.visible
-	sim_settings.visible = false
-	engine_settings.visible = false
+	var was_visible = plant_spawners_panel.visible
+	_hide_all_panels()
+	plant_spawners_panel.visible = !was_visible
 	if plant_spawners_panel.visible:
 		_rebuild_spawner_list()
 
@@ -192,3 +300,9 @@ func _on_window_mode_option_item_selected(index: int) -> void:
 
 func _on_world_radius_box_value_changed(value: float) -> void:
 	WorldWrapper.set_world_radius(value)
+
+func _on_meat_spoil_box_value_changed(value: float) -> void:
+	main.meat_spoil_time = value
+
+func _on_plant_spoil_box_value_changed(value: float) -> void:
+	main.plant_spoil_time = value

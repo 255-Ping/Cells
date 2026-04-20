@@ -74,23 +74,37 @@ color = Color(0.11119685, 0.11119684, 0.11119684, 1)
 [node name="SimSettingsButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1083388489]
 layout_mode = 0
 offset_left = 3.0
-offset_right = 161.0
+offset_right = 89.0
 offset_bottom = 31.0
-text = "Simulation Settings"
+text = "Sim"
 
 [node name="EngineSettingsButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1640782918]
 layout_mode = 0
-offset_left = 163.0
-offset_right = 289.0
+offset_left = 91.0
+offset_right = 177.0
 offset_bottom = 31.0
-text = "Engine Settings"
+text = "Engine"
 
 [node name="PlantSpawnersButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1900000001]
 layout_mode = 0
-offset_left = 291.0
+offset_left = 179.0
+offset_right = 265.0
+offset_bottom = 31.0
+text = "Plants"
+
+[node name="KeybindsButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1900400001]
+layout_mode = 0
+offset_left = 267.0
+offset_right = 353.0
+offset_bottom = 31.0
+text = "Keys"
+
+[node name="LeaveButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1900500001]
+layout_mode = 0
+offset_left = 355.0
 offset_right = 447.0
 offset_bottom = 31.0
-text = "Plant Spawners"
+text = "Leave"
 
 [node name="SimSettings" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1162725853]
 visible = false
@@ -209,6 +223,44 @@ offset_right = 231.0
 offset_bottom = 25.0
 text = "World Radius"
 
+[node name="PlantSpoilBox" type="SpinBox" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings" unique_id=1900300001]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 247.0
+offset_right = 89.5
+offset_bottom = 278.0
+min_value = 0.0
+max_value = 3600.0
+step = 1.0
+value = 0.0
+
+[node name="Label" type="Label" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/PlantSpoilBox" unique_id=1900300002]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 2.0
+offset_right = 310.0
+offset_bottom = 25.0
+text = "Plant Spoil Time (s, 0=never)"
+
+[node name="MeatSpoilBox" type="SpinBox" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings" unique_id=1900200001]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 213.0
+offset_right = 89.5
+offset_bottom = 244.0
+min_value = 0.0
+max_value = 3600.0
+step = 1.0
+value = 30.0
+
+[node name="Label" type="Label" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MeatSpoilBox" unique_id=1900200002]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 2.0
+offset_right = 280.0
+offset_bottom = 25.0
+text = "Meat Spoil Time (s, 0=never)"
+
 [node name="EngineSettings" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1173927216]
 visible = false
 anchors_preset = 0
@@ -261,6 +313,45 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
+[node name="KeybindsPanel" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1900400002]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/KeybindsPanel" unique_id=1900400003]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 39.0
+offset_right = 447.0
+offset_bottom = 565.0
+
+[node name="KeybindList" type="VBoxContainer" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/KeybindsPanel/ScrollContainer" unique_id=1900400004]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LeavePanel" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1900500002]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MainMenuButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/LeavePanel" unique_id=1900500003]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 120.0
+offset_right = 350.0
+offset_bottom = 185.0
+text = "Return to Main Menu"
+
+[node name="ExitButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/LeavePanel" unique_id=1900500004]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 200.0
+offset_right = 350.0
+offset_bottom = 265.0
+text = "Exit Game"
+
 [node name="AddSpawnerButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawners" unique_id=1900000003]
 layout_mode = 0
 offset_left = 3.0
@@ -284,12 +375,18 @@ size_flags_horizontal = 3
 [connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettingsButton" to="." method="_on_sim_settings_button_pressed"]
 [connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettingsButton" to="." method="_on_engine_settings_button_pressed"]
 [connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawnersButton" to="." method="_on_plant_spawners_button_pressed"]
+[connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/KeybindsButton" to="." method="_on_keybinds_button_pressed"]
+[connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/LeaveButton" to="." method="_on_leave_button_pressed"]
+[connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/LeavePanel/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
+[connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/LeavePanel/ExitButton" to="." method="_on_exit_button_pressed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MaxCellsBox" to="." method="_on_max_cells_box_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MaxPlantSlider" to="." method="_on_max_plant_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MaxMeatSlider" to="." method="_on_max_meat_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutChanceSlider" to="." method="_on_mut_chance_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutRateSlider" to="." method="_on_mut_rate_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/WorldRadiusBox" to="." method="_on_world_radius_box_value_changed"]
+[connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MeatSpoilBox" to="." method="_on_meat_spoil_box_value_changed"]
+[connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/PlantSpoilBox" to="." method="_on_plant_spoil_box_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/MaxFPSBox" to="." method="_on_max_fps_box_value_changed"]
 [connection signal="item_selected" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/WindowModeOption" to="." method="_on_window_mode_option_item_selected"]
 [connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawners/AddSpawnerButton" to="." method="_on_add_spawner_button_pressed"]
