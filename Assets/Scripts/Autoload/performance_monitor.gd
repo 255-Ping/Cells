@@ -11,10 +11,12 @@ const FPS_RISE_TO_MEDIUM   = 43
 const FPS_RISE_TO_LOW      = 28
 
 const UPGRADE_HOLD_TIME = 5.0  # Seconds before allowing an upgrade
+const WARMUP_TIME = 3.0        # Seconds to ignore FPS after launch
 
 enum Level { HIGH, MEDIUM, LOW, CRITICAL }
 var current_level: Level = Level.HIGH
 var hold_timer: float = 0.0
+var warmup_timer: float = WARMUP_TIME
 
 # Smoothed FPS to avoid flickering on/off
 var smoothed_fps: float = 60.0
@@ -23,6 +25,11 @@ const SMOOTH_FACTOR = 0.05  # Lower = slower to react, more stable
 signal performance_level_changed(new_level)
 
 func _process(delta):
+	if warmup_timer > 0:
+		warmup_timer -= delta
+		smoothed_fps = 60.0
+		return
+
 	smoothed_fps = lerp(smoothed_fps, Performance.get_monitor(Performance.TIME_FPS), SMOOTH_FACTOR)
 
 	if hold_timer > 0:
