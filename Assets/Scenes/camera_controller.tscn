@@ -233,5 +233,5 @@ text = "Max FPS"
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MaxMeatSlider" to="." method="_on_max_meat_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutChanceSlider" to="." method="_on_mut_chance_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutRateSlider" to="." method="_on_mut_rate_slider_value_changed"]
-[connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/MaxFPSBox" to="." method="_on_max_fps_box_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/WorldRadiusBox" to="." method="_on_world_radius_box_value_changed"]
+[connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/MaxFPSBox" to="." method="_on_max_fps_box_value_changed"]

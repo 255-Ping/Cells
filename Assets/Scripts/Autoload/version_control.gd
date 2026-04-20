@@ -1,3 +1,3 @@
 extends Node
 
-var version: String = "Beta_0.1.0"
+var version: String = "Beta_0.1.1 UNSTABLE"
