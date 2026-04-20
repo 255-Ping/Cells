@@ -51,6 +51,7 @@ var birth_max_health: float
 var birth_movement_speed: float
 var birth_max_hunger: float
 var birth_hunger: float
+var birth_hunger_reserve: float
 
 #Current Stats (with Growth Calculated)
 var current_scale: float
@@ -61,7 +62,10 @@ var current_health: float
 var current_movement_speed: float
 var current_max_hunger: float
 var current_hunger: float
-var hunger_drain: float
+var current_hunger_drain: float
+
+#Birth Stats (Hunger Drain)
+var birth_hunger_drain: float
 
 #Static Stats
 var color: Color
@@ -101,9 +105,10 @@ func _ready() -> void:
 		birth_movement_speed = rng.randf_range(0.5,5)
 		birth_scale = rng.randf_range(0.5,1.25)
 		birth_max_hunger = rng.randf_range(5,15)
-		hunger_drain = rng.randf_range(0.05,0.005)
+		birth_hunger_drain = rng.randf_range(0.05,0.005)
 		growth_hunger = rng.randf_range(1,3)
 		birth_hunger = rng.randf_range(1.5, birth_max_hunger * 0.75)
+		birth_hunger_reserve = rng.randf_range(0.1, 0.5)
 	
 #Cell is BORN
 	elif birth_type.contains("born"):
@@ -130,9 +135,10 @@ func _ready() -> void:
 		birth_movement_speed = gcs.create_rand_stat_from_stat(parent.birth_movement_speed, 0.05 * main.cell_mutation_rate)
 		birth_scale = gcs.create_rand_stat_from_stat(parent.birth_scale, 0.01 * main.cell_mutation_rate)
 		birth_max_hunger = gcs.create_rand_stat_from_stat(parent.birth_max_hunger, 0.005 * main.cell_mutation_rate)
-		hunger_drain = gcs.create_rand_stat_from_stat(parent.hunger_drain, 0.00005 * main.cell_mutation_rate)
+		birth_hunger_drain = gcs.create_rand_stat_from_stat(parent.birth_hunger_drain, 0.00005 * main.cell_mutation_rate)
 		growth_hunger = gcs.create_rand_stat_from_stat(parent.growth_hunger, 0.0005 * main.cell_mutation_rate)
 		birth_hunger = gcs.create_rand_stat_from_stat(parent.birth_hunger, 0.0005 * main.cell_mutation_rate)
+		birth_hunger_reserve = gcs.create_rand_stat_from_stat(parent.birth_hunger_reserve, 0.005 * main.cell_mutation_rate)
 		
 #Apply stats to cell
 	$CollisionPolygon2D/Sprite2D.modulate = Color(color)
@@ -144,6 +150,7 @@ func _ready() -> void:
 	current_movement_speed = birth_movement_speed
 	current_max_hunger = birth_max_hunger
 	current_hunger = birth_hunger * 0.5
+	current_hunger_drain = birth_hunger_drain
 	
 ##################
 #PROCESS FUNCTION#
@@ -195,7 +202,9 @@ func _update_stats_panel():
 	"current_hunger: ", current_hunger, "\n",
 	"current_max_hunger: ", current_max_hunger, "\n",
 	"birth_max_hunger: ", birth_max_hunger, "\n",
-	"hunger_drain: ", hunger_drain, "\n",
+	"birth_hunger_reserve: ", birth_hunger_reserve, "\n",
+	"birth_hunger_drain: ", birth_hunger_drain, "\n",
+	"current_hunger_drain: ", current_hunger_drain, "\n",
 	"\n",
 	
 	"birth_movement_speed: ", birth_movement_speed, "\n",
@@ -214,7 +223,7 @@ func _update_stats_panel():
 	"birth_scale: ", birth_scale, "\n",
 	"current_scale: ", current_scale, "\n",
 	"\n",
-	
+
 	"birth_damage: ", birth_damage, "\n",
 	"current_damage: ", current_damage, "\n",
 	"damage_cooldown: ", damage_cooldown, "\n",
@@ -225,7 +234,7 @@ func _update_stats_panel():
 		
 func _check_for_birth():
 	
-	if current_hunger >= birth_hunger:
+	if current_hunger >= birth_hunger * (1.0 + birth_hunger_reserve):
 		if main.summon_cell(global_position, "born", self):
 			current_hunger -= birth_hunger	
 	
@@ -241,20 +250,23 @@ func _grow(delta: float):
 		current_movement_speed = birth_movement_speed * (current_growth + 1)
 		current_scale = birth_scale * (current_growth + 1)
 		current_max_hunger = birth_max_hunger * (current_growth + 1)
+		current_max_health = birth_max_health * (current_growth + 1)
+		current_damage = birth_damage * (current_growth + 1)
+		current_hunger_drain = birth_hunger_drain * (current_growth + 1)
 		#Check if hunger greater than 0 to drain
 		if current_hunger > 0:
-			current_hunger -= hunger_drain * delta
+			current_hunger -= current_hunger_drain * delta
 		
 func _hunger_check(delta: float):
 	#Check if hunger less than 0 for damage
 	if current_hunger <= 0:
-		current_health -= hunger_drain * delta
+		current_health -= current_hunger_drain * delta
 		return
 	#Check for velocity to remove hunger
 	var velocity_average = (abs(velocity.x) + abs(velocity.y)) / 2
 	if velocity_average > 0:
 		#Remove hunger
-		current_hunger -= (hunger_drain * delta) * (velocity_average * 0.1)
+		current_hunger -= (current_hunger_drain * delta) * (velocity_average * 0.1)
 	
 func _update_stats():
 	scale = Vector2(current_scale,current_scale)
@@ -268,7 +280,7 @@ func _attack(delta: float):
 		for target in attackable_targets:
 			target.take_damage(current_damage, self)
 			if target.is_in_group("cell"):
-				current_hunger -= hunger_drain * delta
+				current_hunger -= current_hunger_drain * delta
 			elif current_hunger < current_max_hunger and target.is_in_group("plant"):
 				current_hunger += current_damage * 0.25
 			elif current_hunger < current_max_hunger and target.is_in_group("meat"):
