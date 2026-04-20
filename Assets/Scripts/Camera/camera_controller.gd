@@ -36,6 +36,7 @@ var _rebind_button: Button = null
 func _ready() -> void:
 	main = get_parent()
 	$Camera2D/RootUI/ScaleUI/VersionLabel.text = VersionControl.version
+	_load_keybinds()
 	_build_keybind_list()
 
 func _process(_delta: float) -> void:
@@ -64,6 +65,7 @@ func _input(event):
 				InputMap.action_erase_events(_rebinding_action)
 				InputMap.action_add_event(_rebinding_action, event)
 				_rebind_button.text = _get_action_string(_rebinding_action)
+				_save_keybinds()
 			_rebinding_action = ""
 			_rebind_button = null
 			get_viewport().set_input_as_handled()
@@ -135,6 +137,39 @@ func _start_rebind(action: String, btn: Button) -> void:
 	_rebinding_action = action
 	_rebind_button = btn
 	btn.text = "[ press key ]"
+
+func _save_keybinds() -> void:
+	var data: Dictionary = {}
+	for entry in BINDABLE_ACTIONS:
+		var action: String = entry[0]
+		var events = InputMap.action_get_events(action)
+		if events.is_empty():
+			continue
+		var event = events[0]
+		if event is InputEventKey:
+			data[action] = {"type": "key", "physical_keycode": event.physical_keycode}
+		elif event is InputEventMouseButton:
+			data[action] = {"type": "mouse", "button_index": event.button_index}
+	SaveManager.save("keybinds", data)
+
+func _load_keybinds() -> void:
+	var data = SaveManager.load_file("keybinds")
+	if data.is_empty():
+		return
+	for action in data:
+		var entry: Dictionary = data[action]
+		var event: InputEvent
+		if entry.get("type") == "key":
+			var e = InputEventKey.new()
+			e.physical_keycode = entry["physical_keycode"]
+			event = e
+		elif entry.get("type") == "mouse":
+			var e = InputEventMouseButton.new()
+			e.button_index = entry["button_index"]
+			event = e
+		if event:
+			InputMap.action_erase_events(action)
+			InputMap.action_add_event(action, event)
 
 func _on_keybinds_button_pressed() -> void:
 	var was_visible = keybinds_panel.visible

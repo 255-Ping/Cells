@@ -32,6 +32,7 @@ config/icon="uid://chmr7oygrcfh3"
 VersionControl="*uid://duweae80k3n5a"
 WorldWrapper="*uid://d4cim7kmuof5j"
 PerformanceMonitor="*uid://csq20rpovs7yk"
+SaveManager="*res://Assets/Scripts/Autoload/save_manager.gd"
 
 [display]
 
