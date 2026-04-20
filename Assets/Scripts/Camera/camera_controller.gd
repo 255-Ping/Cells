@@ -16,6 +16,8 @@ var main
 @onready var keybinds_panel = $Camera2D/RootUI/ScaleUI/Settings/Panel/KeybindsPanel
 @onready var keybind_list = $Camera2D/RootUI/ScaleUI/Settings/Panel/KeybindsPanel/ScrollContainer/KeybindList
 @onready var leave_panel = $Camera2D/RootUI/ScaleUI/Settings/Panel/LeavePanel
+@onready var sim_settings_list = $Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/ScrollContainer/SimSettingsList
+@onready var engine_settings_list = $Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/ScrollContainer/EngineSettingsList
 
 const BINDABLE_ACTIONS: Array = [
 	["camera_move_up",    "Move Up"],
@@ -27,7 +29,9 @@ const BINDABLE_ACTIONS: Array = [
 	["spawn_random_cell", "Spawn Cell"],
 	["spawn_plant",       "Spawn Plant"],
 	["spawn_meat",        "Spawn Meat"],
-	["left_click",        "Click / Select"],
+	["left_click",        "Drag Entity"],
+	["open_stats",        "Open Stats"],
+	["camera_pan",        "Pan Camera"],
 ]
 
 var _rebinding_action: String = ""
@@ -36,6 +40,8 @@ var _rebind_button: Button = null
 func _ready() -> void:
 	main = get_parent()
 	$Camera2D/RootUI/ScaleUI/VersionLabel.text = VersionControl.version
+	_build_sim_settings()
+	_build_engine_settings()
 	_load_keybinds()
 	_build_keybind_list()
 
@@ -96,6 +102,17 @@ func set_camera_speed(value: float):
 	camera_speed = value
 
 func _build_keybind_list() -> void:
+	var toggle = CheckButton.new()
+	toggle.text = "Hold to Spawn"
+	toggle.button_pressed = main.spawn_hold_mode
+	toggle.toggled.connect(func(val: bool): main.spawn_hold_mode = val)
+	toggle.custom_minimum_size = Vector2(0, 28)
+	keybind_list.add_child(toggle)
+
+	var sep = HSeparator.new()
+	sep.custom_minimum_size = Vector2(0, 8)
+	keybind_list.add_child(sep)
+
 	for entry in BINDABLE_ACTIONS:
 		var action: String = entry[0]
 		var label_text: String = entry[1]
@@ -111,7 +128,10 @@ func _build_keybind_list() -> void:
 		btn.text = _get_action_string(action)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var captured = action
-		btn.pressed.connect(func(): _start_rebind(captured, btn))
+		var locked = action in ["left_click", "open_stats", "camera_pan"]
+		btn.disabled = locked
+		if not locked:
+			btn.pressed.connect(func(): _start_rebind(captured, btn))
 		if action == "select_speed":
 			btn.tooltip_text = "Hold this key and press 1–9 to set camera speed."
 		row.add_child(btn)
@@ -306,38 +326,82 @@ func _add_spawner_card(spawner: Node, index: int) -> void:
 
 	spawner_list.add_child(card)
 
-func _on_mut_rate_slider_value_changed(value: float) -> void:
-	main.cell_mutation_rate = value
-	$Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutRateSlider.tooltip_text = str(main.cell_mutation_rate)
+func _build_sim_settings() -> void:
+	_make_spinbox_row(sim_settings_list, "Max Cells",              main.max_cells,            1,   1000, 1,    func(v): main.max_cells = roundi(v))
+	_make_spinbox_row(sim_settings_list, "Max Plants",             main.max_plant,            1,   5000, 1,    func(v): main.max_plant = roundi(v))
+	_make_spinbox_row(sim_settings_list, "Max Meat",               main.max_meat,             1,   5000, 1,    func(v): main.max_meat = roundi(v))
+	_make_spinbox_row(sim_settings_list, "World Radius",           WorldWrapper.world_radius, 50,  2000, 10,   func(v): WorldWrapper.set_world_radius(v))
+	_make_slider_row( sim_settings_list, "Mutation Chance",        main.cell_mutation_chance, 0.0, 1.0,  0.01, func(v): main.cell_mutation_chance = v)
+	_make_slider_row( sim_settings_list, "Mutation Rate",          main.cell_mutation_rate,   0.0, 25.0, 0.1,  func(v): main.cell_mutation_rate = v)
+	_make_spinbox_row(sim_settings_list, "Meat Spoil (s, 0=off)",  main.meat_spoil_time,      0,   3600, 1,    func(v): main.meat_spoil_time = v)
+	_make_spinbox_row(sim_settings_list, "Plant Spoil (s, 0=off)", main.plant_spoil_time,     0,   3600, 1,    func(v): main.plant_spoil_time = v)
 
-func _on_max_cells_box_value_changed(value: float) -> void:
-	main.max_cells = value
+func _make_spinbox_row(parent: Control, label_text: String, default_val: float, min_val: float, max_val: float, step_val: float, on_change: Callable) -> void:
+	var row = HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 28)
+	parent.add_child(row)
+	var lbl = Label.new()
+	lbl.text = label_text
+	lbl.custom_minimum_size = Vector2(160, 0)
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(lbl)
+	var box = SpinBox.new()
+	box.min_value = min_val
+	box.max_value = max_val
+	box.step = step_val
+	box.value = default_val
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.value_changed.connect(on_change)
+	row.add_child(box)
 
-func _on_max_plant_slider_value_changed(value: float) -> void:
-	main.max_plant = roundi(value)
+func _make_slider_row(parent: Control, label_text: String, default_val: float, min_val: float, max_val: float, step_val: float, on_change: Callable) -> void:
+	var row = HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 28)
+	parent.add_child(row)
+	var lbl = Label.new()
+	lbl.text = label_text
+	lbl.custom_minimum_size = Vector2(160, 0)
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(lbl)
+	var slider = HSlider.new()
+	slider.min_value = min_val
+	slider.max_value = max_val
+	slider.step = step_val
+	slider.value = default_val
+	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(slider)
+	var val_lbl = Label.new()
+	val_lbl.text = str(snappedf(default_val, step_val))
+	val_lbl.custom_minimum_size = Vector2(40, 0)
+	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(val_lbl)
+	slider.value_changed.connect(func(v: float):
+		on_change.call(v)
+		val_lbl.text = str(snappedf(v, step_val))
+	)
 
-func _on_max_meat_slider_value_changed(value: float) -> void:
-	main.max_meat = value
-
-func _on_mut_chance_slider_value_changed(value: float) -> void:
-	main.cell_mutation_rate = value
-	$Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutChanceSlider.tooltip_text = str(main.cell_mutation_rate)
-
-func _on_max_fps_box_value_changed(value: float) -> void:
-	Engine.max_fps = roundi(value)
-	PerformanceMonitor.set_target_fps(value)
-
-func _on_window_mode_option_item_selected(index: int) -> void:
-	match index:
-		0: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-		1: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-		2: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
-
-func _on_world_radius_box_value_changed(value: float) -> void:
-	WorldWrapper.set_world_radius(value)
-
-func _on_meat_spoil_box_value_changed(value: float) -> void:
-	main.meat_spoil_time = value
-
-func _on_plant_spoil_box_value_changed(value: float) -> void:
-	main.plant_spoil_time = value
+func _build_engine_settings() -> void:
+	_make_spinbox_row(engine_settings_list, "Max FPS", Engine.max_fps, 20, 9999, 1, func(v):
+		Engine.max_fps = roundi(v)
+		PerformanceMonitor.set_target_fps(v)
+	)
+	var row = HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 28)
+	engine_settings_list.add_child(row)
+	var lbl = Label.new()
+	lbl.text = "Window Mode"
+	lbl.custom_minimum_size = Vector2(160, 0)
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(lbl)
+	var opt = OptionButton.new()
+	opt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	opt.add_item("Windowed", 0)
+	opt.add_item("Fullscreen", 1)
+	opt.add_item("Fullscreen Windowed", 2)
+	opt.item_selected.connect(func(index: int):
+		match index:
+			0: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+			1: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+			2: DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
+	)
+	row.add_child(opt)
