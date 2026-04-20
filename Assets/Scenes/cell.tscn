@@ -9,7 +9,7 @@ radius = 25.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gilj4"]
 
-[node name="Cell" type="CharacterBody2D" unique_id=27172536 groups=["cell", "meat"]]
+[node name="Cell" type="CharacterBody2D" unique_id=27172536 groups=["cell"]]
 motion_mode = 1
 script = ExtResource("1_da881")
 

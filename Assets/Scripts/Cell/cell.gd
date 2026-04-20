@@ -21,6 +21,7 @@ var should_check_hunger: bool = true
 #Identity Variables
 var cell_uuid: String
 var species_uuid: String
+var origin_species_uuid: String = "0"
 var diet_type: String
 var birth_type: String
 var parent: Node
@@ -171,9 +172,9 @@ func _process(delta: float) -> void:
 	
 	if current_health <= 0:
 		if current_hunger <= 0:
-			main.summon_meat(global_position, current_scale * 0.3)
+			main.summon_meat(global_position, current_scale * 0.3, species_uuid)
 		else:
-			main.summon_meat(global_position, current_scale * 0.6)
+			main.summon_meat(global_position, current_scale * 0.6, species_uuid)
 		queue_free()
 		main.current_cells -= 1
 		
@@ -367,6 +368,8 @@ func _on_vision_range_area_entered(area: Area2D) -> void:
 			return
 		if !area.is_in_group("hitbox"):
 			return
+		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
+			return
 		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
 			return
 		targets.append(area.get_parent())
@@ -382,6 +385,8 @@ func _on_vision_range_area_entered(area: Area2D) -> void:
 		if area.get_parent().parent_species_uuid == parent_species_uuid:
 			return
 		if !area.is_in_group("hitbox"):
+			return
+		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
 			return
 		targets.append(area.get_parent())
 	if diet_type == "herbivore":
@@ -404,6 +409,8 @@ func _on_vision_range_area_exited(area: Area2D) -> void:
 			return
 		if !area.is_in_group("hitbox"):
 			return
+		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
+			return
 		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
 			return
 		targets.erase(area.get_parent())
@@ -413,6 +420,8 @@ func _on_vision_range_area_exited(area: Area2D) -> void:
 		if area.get_parent().species_uuid == species_uuid:
 			return
 		if !area.is_in_group("hitbox"):
+			return
+		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
 			return
 		targets.erase(area.get_parent())
 	if diet_type == "herbivore":
@@ -441,6 +450,8 @@ func _on_hit_box_area_entered(area: Area2D) -> void:
 			return
 		if !area.is_in_group("hitbox"):
 			return
+		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
+			return
 		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
 			return
 		attackable_targets.append(area.get_parent())
@@ -456,6 +467,8 @@ func _on_hit_box_area_entered(area: Area2D) -> void:
 		if area.get_parent().parent_species_uuid == parent_species_uuid:
 			return
 		if !area.is_in_group("hitbox"):
+			return
+		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
 			return
 		attackable_targets.append(area.get_parent())
 	if diet_type == "herbivore":
@@ -478,6 +491,8 @@ func _on_hit_box_area_exited(area: Area2D) -> void:
 			return
 		if !area.is_in_group("hitbox"):
 			return
+		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
+			return
 		if !area.get_parent().is_in_group("cell") or !area.get_parent().is_in_group("meat"):
 			return
 		attackable_targets.erase(area.get_parent())
@@ -487,6 +502,8 @@ func _on_hit_box_area_exited(area: Area2D) -> void:
 		if area.get_parent().species_uuid == species_uuid:
 			return
 		if !area.is_in_group("hitbox"):
+			return
+		if area.get_parent().is_in_group("meat") and area.get_parent().origin_species_uuid == species_uuid:
 			return
 		attackable_targets.erase(area.get_parent())
 	if diet_type == "herbivore":

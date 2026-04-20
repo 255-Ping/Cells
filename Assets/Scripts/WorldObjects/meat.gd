@@ -5,6 +5,7 @@ var size: float
 var health: float
 var species_uuid: String = "meat"
 var parent_species_uuid: String = "0"
+var origin_species_uuid: String = ""
 
 var main
 

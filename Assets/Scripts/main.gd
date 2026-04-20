@@ -23,7 +23,7 @@ var current_plant: int = 0
 var plant_spawners: Array = []
 
 #Cell Modifying Variables
-var cell_mutation_chance: float = 0.1
+var cell_mutation_chance: float = 0.03
 var cell_mutation_rate: float = 1.0
 
 func _ready() -> void:
@@ -114,12 +114,13 @@ func summon_plant(pos: Vector2, size: float, spawner: Node = null) -> bool:
 	current_plant += 1
 	return true
 	
-func summon_meat(pos: Vector2, size: float) -> bool:
+func summon_meat(pos: Vector2, size: float, origin_species: String = "") -> bool:
 	if current_meat >= max_meat:
 		return false
 	var instance = meat_node.instantiate()
 	instance.global_position = pos
 	instance.size = size
+	instance.origin_species_uuid = origin_species
 	add_child(instance)
 	current_meat += 1
 	return true

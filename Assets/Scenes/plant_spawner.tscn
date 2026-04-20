@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://38klbphq12b8"]
 
-[ext_resource type="Script" path="res://Assets/Scripts/WorldObjects/plant_spawner.gd" id="1"]
+[ext_resource type="Script" uid="uid://cips018kfwr1j" path="res://Assets/Scripts/WorldObjects/plant_spawner.gd" id="1"]
 
-[node name="PlantSpawner" type="Node2D"]
+[node name="PlantSpawner" type="Node2D" unique_id=963418491]
 script = ExtResource("1")
