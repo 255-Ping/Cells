@@ -5,6 +5,7 @@ var size: float
 var health: float
 var species_uuid: String = "plant"
 var parent_species_uuid: String = "0"
+var spawner: Node = null
 
 var main
 
@@ -21,6 +22,8 @@ func take_damage(amount: float, _attacker_node: Node):
 	health -= amount
 	if health <= 0:
 		main.current_plant -= 1
+		if spawner:
+			spawner.plant_died()
 		queue_free()
 		
 func _on_perf_changed(level):

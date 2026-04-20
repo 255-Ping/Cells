@@ -60,8 +60,8 @@ offset_bottom = 40.0
 layout_mode = 0
 offset_left = -634.0
 offset_top = -322.0
-offset_right = -234.0
-offset_bottom = 212.0
+offset_right = -184.0
+offset_bottom = 246.0
 
 [node name="ColorRect" type="ColorRect" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1678114973]
 layout_mode = 0
@@ -84,6 +84,13 @@ offset_left = 163.0
 offset_right = 289.0
 offset_bottom = 31.0
 text = "Engine Settings"
+
+[node name="PlantSpawnersButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1900000001]
+layout_mode = 0
+offset_left = 291.0
+offset_right = 447.0
+offset_bottom = 31.0
+text = "Plant Spawners"
 
 [node name="SimSettings" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1162725853]
 anchors_preset = 0
@@ -225,6 +232,31 @@ offset_right = 231.0
 offset_bottom = 25.0
 text = "Max FPS"
 
+[node name="PlantSpawners" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1900000002]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="AddSpawnerButton" type="Button" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawners" unique_id=1900000003]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 39.0
+offset_right = 200.0
+offset_bottom = 70.0
+text = "Add Plant Spawner"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawners" unique_id=1900000004]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 73.0
+offset_right = 447.0
+offset_bottom = 243.0
+
+[node name="SpawnerList" type="VBoxContainer" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawners/ScrollContainer" unique_id=1900000005]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettingsButton" to="." method="_on_sim_settings_button_pressed"]
 [connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettingsButton" to="." method="_on_engine_settings_button_pressed"]
@@ -234,4 +266,6 @@ text = "Max FPS"
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutChanceSlider" to="." method="_on_mut_chance_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutRateSlider" to="." method="_on_mut_rate_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/WorldRadiusBox" to="." method="_on_world_radius_box_value_changed"]
+[connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawnersButton" to="." method="_on_plant_spawners_button_pressed"]
+[connection signal="pressed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/PlantSpawners/AddSpawnerButton" to="." method="_on_add_spawner_button_pressed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/MaxFPSBox" to="." method="_on_max_fps_box_value_changed"]

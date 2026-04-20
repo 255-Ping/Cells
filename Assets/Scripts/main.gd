@@ -18,18 +18,34 @@ var current_plant: int = 0
 @onready var cell_node = preload("res://Assets/Scenes/cell.tscn")
 @onready var plant_node = preload("res://Assets/Scenes/plant.tscn")
 @onready var meat_node = preload("res://Assets/Scenes/meat.tscn")
+@onready var plant_spawner_node = preload("res://Assets/Scenes/plant_spawner.tscn")
+
+var plant_spawners: Array = []
 
 #Cell Modifying Variables
 var cell_mutation_chance: float = 0.1
 var cell_mutation_rate: float = 1.0
 
-#Plant Summon Variables 
-var plant_summon_time: float = 2.5
-var plant_summon_timer: float = 2.5
-
 func _ready() -> void:
 	Engine.max_fps = 60
 	PerformanceMonitor.performance_level_changed.connect(_on_perf_changed)
+	add_plant_spawner(WorldWrapper.world_radius, max_plant, 0.5, Vector2.ZERO)
+
+func add_plant_spawner(p_radius: float, p_density: int, p_nutrition: float, pos: Vector2) -> Node:
+	var spawner = plant_spawner_node.instantiate()
+	spawner.radius = p_radius
+	spawner.plant_density = p_density
+	spawner.plant_nutrition = p_nutrition
+	spawner.position = pos
+	add_child(spawner)
+	plant_spawners.append(spawner)
+	return spawner
+
+func remove_plant_spawner(index: int):
+	if index < 0 or index >= plant_spawners.size():
+		return
+	plant_spawners[index].queue_free()
+	plant_spawners.remove_at(index)
 
 func _on_perf_changed(level) -> void:
 	match level:
@@ -43,13 +59,7 @@ func _on_perf_changed(level) -> void:
 			perf_cell_cap = max(1, current_cells - 10)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	if plant_summon_timer > 0:
-		plant_summon_timer -= delta
-	else:
-		plant_summon_timer = plant_summon_time
-		for i in 5:
-			summon_plant(math.random_point_in_circle(250.0), rng.randf_range(0.25, 0.75))
+func _process(_delta: float) -> void:
 	_check_summon_cell_at_mouse()
 	_check_summon_plant_at_mouse()
 	_check_summon_meat_at_mouse()
@@ -92,12 +102,14 @@ func summon_cell(pos: Vector2, birth_type: String, parent: Node = null) -> bool:
 	current_cells += 1
 	return true
 	
-func summon_plant(pos: Vector2, size: float) -> bool:
+func summon_plant(pos: Vector2, size: float, spawner: Node = null) -> bool:
 	if current_plant >= max_plant:
 		return false
 	var instance = plant_node.instantiate()
 	instance.global_position = pos
 	instance.size = size
+	if spawner:
+		instance.spawner = spawner
 	add_child(instance)
 	current_plant += 1
 	return true
