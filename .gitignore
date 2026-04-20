@@ -5,6 +5,7 @@
 # Godot editor data (DO NOT COMMIT)
 .godot/
 *.gd.uid
+*.gdshader.uid
 godot/
 
 #################################
@@ -29,6 +30,13 @@ build/
 *.tmp
 *.bak
 *.swp
+
+#################################
+# Claude Code
+#################################
+
+CLAUDE.md
+.claude/
 
 #################################
 # IDE / editor junk

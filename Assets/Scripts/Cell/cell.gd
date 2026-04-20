@@ -15,6 +15,8 @@ var performance_level: String = "HIGH"
 var can_move: bool = true
 var can_attack: bool = true
 var can_birth: bool = true
+var should_update_stat_panel: bool = true
+var should_check_hunger: bool = true
 
 #Identity Variables
 var cell_uuid: String
@@ -110,15 +112,15 @@ func _ready() -> void:
 		if birth_type.contains("mutate"):
 			species_uuid = gcs.create_uuid()
 			parent_species_uuid = parent.species_uuid
-			color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.075 * main.cell_mutation_rate)
-			color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.075 * main.cell_mutation_rate)
-			color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.075 * main.cell_mutation_rate)
+			color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.0075 * main.cell_mutation_rate)
+			color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.0075 * main.cell_mutation_rate)
+			color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.0075 * main.cell_mutation_rate)
 		else:
 			species_uuid = parent.species_uuid
 			parent_species_uuid = parent.parent_species_uuid
-			color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.005 * main.cell_mutation_rate)
-			color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.005 * main.cell_mutation_rate)
-			color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.005 * main.cell_mutation_rate)
+			color.r = gcs.create_rand_stat_from_stat(parent.color.r, 0.0005 * main.cell_mutation_rate)
+			color.g = gcs.create_rand_stat_from_stat(parent.color.g, 0.0005 * main.cell_mutation_rate)
+			color.b = gcs.create_rand_stat_from_stat(parent.color.b, 0.0005 * main.cell_mutation_rate)
 		diet_type = parent.diet_type
 		growth_speed = gcs.create_rand_stat_from_stat(parent.growth_speed, 0.000005 * main.cell_mutation_rate)
 		movement_change = gcs.create_rand_stat_from_stat(parent.movement_change, 0.00005 * main.cell_mutation_rate)
@@ -153,18 +155,18 @@ func _process(delta: float) -> void:
 	if can_attack:
 		_attack(delta)
 	_grow(delta)
-	_hunger_check(delta)
+	if should_check_hunger:
+		_hunger_check(delta)
 	if can_birth:
 		_check_for_birth()
-	_update_stats_panel()
+	if should_update_stat_panel:
+		_update_stats_panel()
 	
 	if current_health <= 0:
 		if current_hunger <= 0:
-			if main.summon_meat(global_position, current_scale * 0.3):
-				print("Summoned Meat!")
+			main.summon_meat(global_position, current_scale * 0.3)
 		else:
-			if main.summon_meat(global_position, current_scale * 0.6):
-				print("Summoned Meat!")
+			main.summon_meat(global_position, current_scale * 0.6)
 		queue_free()
 		main.current_cells -= 1
 		
@@ -274,7 +276,7 @@ func _attack(delta: float):
 
 	
 func take_damage(amount: float, attacker_node: Node):
-	print("damaged: ", amount)
+	#print("damaged: ", amount)
 	current_health -= amount
 	damaged += amount
 	attacker = attacker_node
@@ -380,7 +382,6 @@ func _on_vision_range_area_entered(area: Area2D) -> void:
 		if !area.get_parent().is_in_group("plant"):
 			return
 		targets.append(area.get_parent())
-	#print(area.get_parent())
 
 
 func _on_vision_range_area_exited(area: Area2D) -> void:
@@ -412,7 +413,6 @@ func _on_vision_range_area_exited(area: Area2D) -> void:
 		if !area.get_parent().is_in_group("plant"):
 			return
 		targets.erase(area.get_parent())
-	#print(area.get_parent())
 
 
 func _on_hit_box_area_entered(area: Area2D) -> void:
@@ -456,7 +456,6 @@ func _on_hit_box_area_entered(area: Area2D) -> void:
 		if !area.get_parent().is_in_group("plant"):
 			return
 		attackable_targets.append(area.get_parent())
-	#print(area.get_parent())
 
 
 func _on_hit_box_area_exited(area: Area2D) -> void:
@@ -488,7 +487,6 @@ func _on_hit_box_area_exited(area: Area2D) -> void:
 		if !area.get_parent().is_in_group("plant"):
 			return
 		attackable_targets.erase(area.get_parent())
-	#print(area.get_parent())
 	
 func _on_perf_changed(level):
 	match level:
@@ -496,21 +494,29 @@ func _on_perf_changed(level):
 			can_move = true
 			can_attack = true
 			can_birth = true
+			should_update_stat_panel = true
+			should_check_hunger = true
 			set_collision_layer_value(1, true)
 		PerformanceMonitor.Level.MEDIUM:
-			can_move = false
+			can_move = true
 			can_attack = true
 			can_birth = true
-			set_collision_layer_value(1, true)
+			should_update_stat_panel = false
+			should_check_hunger = true
+			set_collision_layer_value(1, false)
 		PerformanceMonitor.Level.LOW:
 			can_move = false
 			can_attack = true
 			can_birth = false
+			should_update_stat_panel = false
+			should_check_hunger = false
 			set_collision_layer_value(1, false)
 		PerformanceMonitor.Level.CRITICAL:
 			can_move = false
 			can_attack = false
 			can_birth = false
+			should_update_stat_panel = false
+			should_check_hunger = false
 			set_collision_layer_value(1, false)
 			
 

@@ -61,7 +61,7 @@ layout_mode = 0
 offset_left = -634.0
 offset_top = -322.0
 offset_right = -234.0
-offset_bottom = 178.0
+offset_bottom = 212.0
 
 [node name="ColorRect" type="ColorRect" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1678114973]
 layout_mode = 0
@@ -182,6 +182,25 @@ offset_right = 298.0
 offset_bottom = 19.0
 text = "Cell Mutation Rate"
 
+[node name="WorldRadiusBox" type="SpinBox" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings" unique_id=529374801]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 179.0
+offset_right = 89.5
+offset_bottom = 210.0
+min_value = 50.0
+max_value = 2000.0
+step = 10.0
+value = 300.0
+
+[node name="Label" type="Label" parent="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/WorldRadiusBox" unique_id=529374802]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 2.0
+offset_right = 231.0
+offset_bottom = 25.0
+text = "World Radius"
+
 [node name="EngineSettings" type="Control" parent="Camera2D/RootUI/ScaleUI/Settings/Panel" unique_id=1173927216]
 visible = false
 anchors_preset = 0
@@ -215,3 +234,4 @@ text = "Max FPS"
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutChanceSlider" to="." method="_on_mut_chance_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutRateSlider" to="." method="_on_mut_rate_slider_value_changed"]
 [connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/EngineSettings/MaxFPSBox" to="." method="_on_max_fps_box_value_changed"]
+[connection signal="value_changed" from="Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/WorldRadiusBox" to="." method="_on_world_radius_box_value_changed"]

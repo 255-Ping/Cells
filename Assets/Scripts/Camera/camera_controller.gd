@@ -34,7 +34,6 @@ func _check_sprinting():
 func _input(event):
 	if Input.is_action_pressed("select_speed"):
 		if event is InputEventKey and event.pressed:
-			#print(event.keycode)
 			match event.keycode:
 				KEY_1: set_camera_speed(1.0)
 				KEY_2: set_camera_speed(2.0)
@@ -47,7 +46,7 @@ func _input(event):
 				KEY_9: set_camera_speed(9.0)
 				
 func set_camera_speed(value: float):
-	print(value, " camera speed")
+	print("Camera Speed set to ", value)
 	camera_speed = value
 
 func _on_button_pressed() -> void:
@@ -57,36 +56,29 @@ func _on_sim_settings_button_pressed() -> void:
 	sim_settings.visible = !sim_settings.visible
 	engine_settings.visible = false
 
-
 func _on_engine_settings_button_pressed() -> void:
 	engine_settings.visible = !engine_settings.visible 
 	sim_settings.visible = false
 
-
 func _on_mut_rate_slider_value_changed(value: float) -> void:
 	main.cell_mutation_rate = value
-	print(main.cell_mutation_rate)
 	$Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutRateSlider.tooltip_text = str(main.cell_mutation_rate)
-
 
 func _on_max_cells_box_value_changed(value: float) -> void:
 	main.max_cells = value
-	print(main.max_cells)
 
 func _on_max_plant_slider_value_changed(value: float) -> void:
 	main.max_plant = value
-	print(main.max_plant)
-	
 	
 func _on_max_meat_slider_value_changed(value: float) -> void:
 	main.max_meat = value
-	print(main.max_meat)
-	
 
 func _on_mut_chance_slider_value_changed(value: float) -> void:
 	main.cell_mutation_rate = value
-	print(main.cell_mutation_rate)
 	$Camera2D/RootUI/ScaleUI/Settings/Panel/SimSettings/MutChanceSlider.tooltip_text = str(main.cell_mutation_rate)
 
 func _on_max_fps_box_value_changed(value: float) -> void:
 	Engine.max_fps = roundi(value)
+
+func _on_world_radius_box_value_changed(value: float) -> void:
+	WorldWrapper.set_world_radius(value)

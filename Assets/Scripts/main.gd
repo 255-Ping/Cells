@@ -6,6 +6,7 @@ var rng = RandomNumberGenerator.new()
 
 var max_cells: int = 50
 var current_cells: int = 0
+var perf_cell_cap: int = 50
 
 var max_meat: int = 100
 var current_meat: int = 0
@@ -28,6 +29,18 @@ var plant_summon_timer: float = 2.5
 
 func _ready() -> void:
 	Engine.max_fps = 60
+	PerformanceMonitor.performance_level_changed.connect(_on_perf_changed)
+
+func _on_perf_changed(level) -> void:
+	match level:
+		PerformanceMonitor.Level.HIGH:
+			perf_cell_cap = max_cells
+		PerformanceMonitor.Level.MEDIUM:
+			perf_cell_cap = current_cells
+		PerformanceMonitor.Level.LOW:
+			perf_cell_cap = max(1, current_cells - 5)
+		PerformanceMonitor.Level.CRITICAL:
+			perf_cell_cap = max(1, current_cells - 10)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -36,31 +49,27 @@ func _process(delta: float) -> void:
 	else:
 		plant_summon_timer = plant_summon_time
 		for i in 5:
-			if summon_plant(math.random_point_in_circle(250.0),rng.randf_range(0.25,0.75)):
-				print("Randomly Summoned Plant!")
-			#math.random_point_in_circle()
+			summon_plant(math.random_point_in_circle(250.0), rng.randf_range(0.25, 0.75))
 	_check_summon_cell_at_mouse()
 	_check_summon_plant_at_mouse()
 	_check_summon_meat_at_mouse()
+
 	_check_click_on_cells()
 	
 func _check_summon_cell_at_mouse():
 	if !Input.is_action_just_pressed("spawn_random_cell"):
 		return
-	if summon_cell(get_global_mouse_position(), "miracle"):
-		print("Miracle Cell Summoned!")
+	summon_cell(get_global_mouse_position(), "miracle")
 	
 func _check_summon_plant_at_mouse():
 	if !Input.is_action_just_pressed("spawn_plant"):
 		return
-	if summon_plant(get_global_mouse_position(), 1.0):
-		print("Plant Summoned!")
+	summon_plant(get_global_mouse_position(), 1.0)
 	
 func _check_summon_meat_at_mouse():
 	if !Input.is_action_just_pressed("spawn_meat"):
 		return
-	if summon_meat(get_global_mouse_position(), 1.0):
-		print("Meat Summoned!")
+	summon_meat(get_global_mouse_position(), 1.0)
 	
 func _check_click_on_cells():
 	if !Input.is_action_just_pressed("left_click"):
@@ -70,7 +79,7 @@ func _check_click_on_cells():
 			area.get_parent().stats_panel.visible = !area.get_parent().stats_panel.visible
 	
 func summon_cell(pos: Vector2, birth_type: String, parent: Node = null) -> bool:
-	if current_cells >= max_cells:
+	if current_cells >= min(max_cells, perf_cell_cap):
 		return false
 	var instance = cell_node.instantiate()
 	instance.global_position = pos
